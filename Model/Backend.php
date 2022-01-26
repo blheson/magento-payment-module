@@ -7,6 +7,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Rocketfuel\Rocketfuel\Api\BackendInterface;
 use Magento\Framework\App\RequestInterface;
 use Rocketfuel\Rocketfuel\Model\Rocketfuel;
+use Rocketfuel\Rocketfuel\Model\Curl;
 
 /**
  * @api
@@ -43,17 +44,19 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      * Callback constructor.
      * @param RequestInterface $request
      * @param OrderInterface $order
+     * @param Curl $curl
      * @param \Rocketfuel\Rocketfuel\Model\Rocketfuel $rocketfuel
      */
     public function __construct(
         RequestInterface $request,
         OrderInterface $order,
+        Curl $curl,
         Rocketfuel $rocketfuel
-    )
-    {
+    ) {
         $this->rfService = $rocketfuel;
         $this->request = $request;
         $this->order = $order;
+        $this->curl = $curl;
     }
 
 
@@ -157,5 +160,21 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
             return false;
         }
     }
+    /**
+     * Validate post body
+     *
+     * @param $request
+     * @return object
+     */
+    public function getAuth()
+    {
+        // $credentials = array(
+        //     'email' => $this->rfService->getEmail(),
+        //     'password' => $this->rfService->getPassword()
+        // );
+        // $response = $this->curl->auth($credentials);
 
+        echo json_encode(array('trea' => 'tea'));
+        // echo json_encode(array('trea' => 'tea', 'response' => $response));
+    }
 }

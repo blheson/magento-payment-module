@@ -10,7 +10,7 @@
                     <label>Callback url</label>
                     <comment>
                         <![CDATA[
-                            <h1>%your_shop_url%//rest/V1/rocketfuel-callback</h1>
+                            <h1>%your_shop_url%//rest/v1/rocketfuel-callback</h1>
                         ]]>
                     </comment>
                 </field>
@@ -32,6 +32,11 @@
                  <field id="rocketfuel_merchant_email" translate="label comment" sortOrder="1" type="text" showInDefault="1"
                        showInWebsite="1" showInStore="0">
                     <label>Rocketfuel merchant email</label>
+                    <validate></validate>
+                </field>
+                 <field id="rocketfuel_merchant_password" translate="label comment" sortOrder="1" type="text" showInDefault="1"
+                       showInWebsite="1" showInStore="0">
+                    <label>Rocketfuel merchant pasword</label>
                     <validate></validate>
                 </field>
                 <field id="rocketfuel_iframe_url" translate="label comment" sortOrder="1" type="select"

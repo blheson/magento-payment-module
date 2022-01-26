@@ -21,7 +21,7 @@ function rocketRun(id) {
 }
 
 function getPayload(id) {
-    let url = '/rest/V1/rocketfuel-get-payload/' + id;
+    let url = '/rest/v1/rocketfuel-get-payload/' + id;
     let payload;
     //Get payload for rocketfuel cart
     const request = new XMLHttpRequest();

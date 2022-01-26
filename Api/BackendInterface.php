@@ -4,8 +4,6 @@ namespace Rocketfuel\Rocketfuel\Api;
 
 interface BackendInterface
 {
-
-
     /**
      * @return mixed
      * @api
@@ -25,4 +23,9 @@ interface BackendInterface
      * @return mixed
      */
     public function getCallback();
+     /**
+     * callback for test GET
+     * @return mixed
+     */
+    public function getAuth();
 }

@@ -50,13 +50,13 @@ $order = $block->getOrder();
 </style>
 
 <div class="checkout-success">
-    <div id="rocketfuel-iframe-container">
+    <!-- <div id="rocketfuel-iframe-container">
         <div id="rocketfuel-drag">
             <div id="rocketfuel-dragheader"></div>
         </div>
         <iframe id="rocketfuel-iframe" src="<?php echo $block->getIframeUrl() ?>" onload="rocketRun(<?php echo $order->getId() ?>)">
         </iframe>
-    </div>
+    </div> -->
     <button class="action primary">
         <?php echo __('Pay with/success Rocketfuel') ?>
     </button>
@@ -70,9 +70,9 @@ $order = $block->getOrder();
         <p><?php echo __('We\'ll email you an order confirmation with details and tracking info.') ?></p>
     <?php endif; ?>
     <input type="hidden" name="rocket_order_id" value=<?php echo $order->getId(); ?>>
-    <input type="hidden" name="rocket_environment" value=<?php echo $order->getId(); ?>>
-    <input type="hidden" name="rocket_user_data" value=<?php echo $order->getId(); ?>>
-    <input type="hidden" name="rest_url" value=<?php echo $order->getId(); ?>>
+    <input type="hidden" name="rocket_environment" value=<?php echo $block->getEnvironment(); ?>>
+    <input type="hidden" name="rocket_user_data" value=<?php echo $block->userData(); ?>>
+    <input type="hidden" name="rest_update_order_url" value=<?php echo $block->restUpdateOrderUrl(); ?>>
 </div>
 <script>
     /**
@@ -80,10 +80,24 @@ $order = $block->getOrder();
      */
     const RocketfuelPaymentEngine = {
 
+        getPayload: (id) => {
+            let url = '/rest/V1/rocketfuel-get-payload/' + id;
+            let payload;
+            //Get payload for rocketfuel cart
+            const request = new XMLHttpRequest();
+            request.open('GET', url, false);
+            request.addEventListener("readystatechange", () => {
+                if (request.readyState === 4 && request.status === 200) {
+                    payload = JSON.parse(request.responseText)
+                }
+            });
+            request.send();
+            return payload;
+        },
         order_id: document.querySelector('input[name=rocket_order_id]').value,
- 
+
         watchIframeShow: false,
- 
+
         getUUID: function() {
             return 'b9eb6b1f-2e0f-4b02-8b39-bdc7b73fbfbc';
         },
@@ -94,7 +108,7 @@ $order = $block->getOrder();
             return environment || 'prod';
         },
         getUserData: function() {
-            let user_data =  document.querySelector('input[name=rocket_user_data]').value;
+            let user_data = document.querySelector('input[name=rocket_user_data]').value;
 
             if (!user_data) return false;
 
@@ -103,7 +117,7 @@ $order = $block->getOrder();
         updateOrder: function(result) {
             try {
 
-                let rest_url = document.querySelector("input[name=rest_url]").value;
+                let rest_url = document.querySelector("input[name=rest_update_order_url]").value;
 
                 console.log("Response from callback :", result);
 
@@ -171,7 +185,7 @@ $order = $block->getOrder();
             //show retrigger button
             // document.getElementById('rocketfuel_retrigger_payment_button').disabled = false;
             // document.getElementById('rocketfuel_retrigger_payment').style.display = "block";
-          
+
         },
         prepareProgressMessage: function() {
 
