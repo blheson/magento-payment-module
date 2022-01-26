@@ -1,0 +1,26 @@
+{
+    "name": "rocketfuel/module-rocketfuel-magento2",
+    "description": "RocketFuel - RocketFuel Payment Method",
+    "type": "magento2-module",
+    "license": "MIT",
+    "version": "0.2.3",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "RocketFuel",
+            "email": "dev@rocketfuel.net"
+        }
+    ],
+    "require": {
+        "php": "~7.3.0||~7.4.0",
+        "magento/module-payment": "100.1.*",
+        "magento/module-checkout": "100.1.*",
+        "magento/module-sales": "100.1.*"
+    },
+    "autoload": {
+        "files": [ "registration.php" ],
+        "psr-4": {
+            "Rocketfuel\\Rocketfuel\\": ""
+        }
+    }
+}
