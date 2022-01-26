@@ -18,7 +18,7 @@ $order = $block->getOrder();
         cursor: grabbing;
     }
 
-    #rocketfuel-drag:active + #rocketfuel-iframe {
+    #rocketfuel-drag:active+#rocketfuel-iframe {
         box-shadow: 0px 4px 7px rgba(0, 0, 0, 0.6);
         transform: scale(1.01);
     }
@@ -54,17 +54,13 @@ $order = $block->getOrder();
         <div id="rocketfuel-drag">
             <div id="rocketfuel-dragheader"></div>
         </div>
-        <iframe id="rocketfuel-iframe" src="<?php echo $block->getIframeUrl() ?>"
-                onload="rocketRun(<?php echo $order->getId() ?>)">
+        <iframe id="rocketfuel-iframe" src="<?php echo $block->getIframeUrl() ?>" onload="rocketRun(<?php echo $order->getId() ?>)">
         </iframe>
     </div>
-    <button
-        class="action primary"
-        onclick="rocketRun(<?php echo $order->getId() ?>)"
-    >
-        <?php echo __('Pay with/on Rocketfuel') ?>
+    <button class="action primary">
+        <?php echo __('Pay with/success Rocketfuel') ?>
     </button>
-    <?php if ($order->getIncrementId()): ?>
+    <?php if ($order->getIncrementId()) : ?>
         <?php if ($block->getCustomerId()) : ?>
 
             <p><?php echo __('Your order number is: ' . $order->getIncrementId()) ?></p>
@@ -73,4 +69,239 @@ $order = $block->getOrder();
         <?php endif; ?>
         <p><?php echo __('We\'ll email you an order confirmation with details and tracking info.') ?></p>
     <?php endif; ?>
+    <input type="hidden" name="rocket_order_id" value=<?php echo $order->getId(); ?>>
+    <input type="hidden" name="rocket_environment" value=<?php echo $order->getId(); ?>>
+    <input type="hidden" name="rocket_user_data" value=<?php echo $order->getId(); ?>>
+    <input type="hidden" name="rest_url" value=<?php echo $order->getId(); ?>>
 </div>
+<script>
+    /**
+     * Payment Engine object
+     */
+    const RocketfuelPaymentEngine = {
+
+        order_id: document.querySelector('input[name=rocket_order_id]').value,
+ 
+        watchIframeShow: false,
+ 
+        getUUID: function() {
+            return 'b9eb6b1f-2e0f-4b02-8b39-bdc7b73fbfbc';
+        },
+        getEnvironment: function() {
+            let environment = document.querySelector('input[name=rocket_environment]').value;
+
+
+            return environment || 'prod';
+        },
+        getUserData: function() {
+            let user_data =  document.querySelector('input[name=rocket_user_data]').value;
+
+            if (!user_data) return false;
+
+            return JSON.parse(user_data);
+        },
+        updateOrder: function(result) {
+            try {
+
+                let rest_url = document.querySelector("input[name=rest_url]").value;
+
+                console.log("Response from callback :", result);
+
+                console.log("order_id :", RocketfuelPaymentEngine.order_id);
+
+                let status = "wc-on-hold";
+                let result_status = parseInt(result.status);
+                if (result_status == 101) {
+                    status = "wc-partial-payment";
+                }
+                if (result_status == 1 || result.status == "completed") {
+                    status = "admin_default"; //placeholder to get order status set by seller
+                }
+                if (result_status == -1) {
+                    status = "wc-failed";
+                }
+                let fd = new FormData();
+                fd.append("order_id", RocketfuelPaymentEngine.order_id);
+                fd.append("status", status);
+                fetch(rest_url, {
+                    method: "POST",
+                    body: fd
+                }).then(res => res.json()).then(result => {
+                    console.log(result)
+
+                }).catch(e => {
+                    console.log(e)
+
+                })
+            } catch (error) {
+
+            }
+            // RocketfuelPaymentEngine.showFinalOrderDetails();
+
+        },
+        showFinalOrderDetails: () => {
+            // document.getElementById('rocket_fuel_payment_overlay_gateway').remove();
+        },
+        startPayment: function(autoTriggerState = true) {
+
+            if (!autoTriggerState) {
+
+                // document.getElementById('rocketfuel_retrigger_payment_button').innerText = "Preparing Payment window...";
+                this.watchIframeShow = true;
+
+            }
+
+            // document.getElementById('rocketfuel_retrigger_payment_button').disabled = true;
+
+            let checkIframe = setInterval(() => {
+
+                if (RocketfuelPaymentEngine.rkfl.iframeInfo.iframe) {
+                    RocketfuelPaymentEngine.rkfl.initPayment();
+                    clearInterval(checkIframe);
+                }
+
+            }, 500);
+
+        },
+        prepareRetrigger: function() {
+
+            //hide processing payment
+            // document.getElementById('rocketfuel_before_payment').style.cssText = "visibility:hidden;height:0;width:0";
+
+            //show retrigger button
+            // document.getElementById('rocketfuel_retrigger_payment_button').disabled = false;
+            // document.getElementById('rocketfuel_retrigger_payment').style.display = "block";
+          
+        },
+        prepareProgressMessage: function() {
+
+            //show processing payment
+            // document.getElementById('rocketfuel_before_payment').style.cssText = "visibility:visible;height:auto;width:auto";
+
+            //hide retrigger button
+            // document.getElementById('rocketfuel_retrigger_payment_button').innerText = "Resume Payment"; //revert trigger button message
+
+            // document.getElementById('rocketfuel_retrigger_payment').style.display = "none";
+        },
+
+        windowListener: function() {
+            let engine = this;
+            window.addEventListener('message', (event) => {
+
+                switch (event.data.type) {
+                    case 'rocketfuel_iframe_close':
+                        if (document.getElementById('rocketfuel_before_payment'))
+                            engine.prepareRetrigger();
+                        break;
+                    case 'rocketfuel_new_height':
+                        if (engine.watchIframeShow && document.getElementById('rocketfuel_before_payment')) {
+                            engine.prepareProgressMessage();
+                            engine.watchIframeShow = false;
+
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+            })
+        },
+        initRocketFuel: async function() {
+            return new Promise(async (resolve, reject) => {
+                if (!RocketFuel) {
+                    location.reload();
+                    reject();
+                }
+                let userData = RocketfuelPaymentEngine.getUserData();
+                let payload, response, rkflToken;
+                // RocketfuelPaymentEngine.getAutoLoginInfo();
+                RocketfuelPaymentEngine.rkfl = new RocketFuel({
+                    environment: RocketfuelPaymentEngine.getEnvironment()
+                });
+
+                if (userData.first_name) {
+                    payload = {
+                        firstName: userData.first_name,
+                        lastName: userData.last_name,
+                        email: userData.email,
+                        merchantAuth: userData.merchant_auth,
+                        kycType: 'null',
+                        kycDetails: {
+                            'DOB': "01-01-1990"
+                        }
+                    }
+
+
+                    try {
+                        if (RocketfuelPaymentEngine.getEnvironment() !== 'prod') { //remove signon details when testing
+                            localStorage.removeItem('rkfl_token');
+                            localStorage.removeItem('access');
+                        }
+
+                        rkflToken = localStorage.getItem('rkfl_token');
+
+                        if (!rkflToken) {
+
+                            response = await RocketfuelPaymentEngine.rkfl.rkflAutoSignUp(payload, RocketfuelPaymentEngine.getEnvironment());
+
+
+                            if (response) {
+                                rkflToken = response.result?.rkflToken;
+                            }
+
+                        }
+
+                        const rkflConfig = {
+                            uuid: this.getUUID(),
+                            callback: RocketfuelPaymentEngine.updateOrder,
+                            environment: RocketfuelPaymentEngine.getEnvironment()
+                        }
+                        if (rkflToken) {
+                            rkflConfig.token = rkflToken
+                        }
+                        console.log(rkflConfig);
+                        RocketfuelPaymentEngine.rkfl = new RocketFuel(rkflConfig);
+                        resolve(true);
+                    } catch (error) {
+                        reject();
+                    }
+
+                }
+                resolve('no auto data');
+            })
+
+        },
+        getAutoLoginInfo: () => {
+            console.log("Data from localstorage: ", localStorage.getItem('rkfl_token'));
+        },
+        init: async function() {
+
+            let engine = this;
+            console.log('Start initiating RKFL');
+
+            try {
+
+                await engine.initRocketFuel();
+
+            } catch (error) {
+                console.log('error from promise', error)
+            }
+
+            console.log('Done initiating RKFL');
+
+            engine.windowListener();
+
+            if (document.getElementById('rocketfuel_retrigger_payment_button')) {
+                document.getElementById('rocketfuel_retrigger_payment_button').addEventListener('click', () => {
+                    RocketfuelPaymentEngine.startPayment(false);
+                });
+
+            }
+
+            engine.startPayment();
+
+        }
+    }
+
+    RocketfuelPaymentEngine.init();
+</script>

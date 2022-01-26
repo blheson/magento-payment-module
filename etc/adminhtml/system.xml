@@ -29,6 +29,11 @@
                     <label>Rocketfuel merchant public key</label>
                     <validate></validate>
                 </field>
+                 <field id="rocketfuel_merchant_email" translate="label comment" sortOrder="1" type="text" showInDefault="1"
+                       showInWebsite="1" showInStore="0">
+                    <label>Rocketfuel merchant email</label>
+                    <validate></validate>
+                </field>
                 <field id="rocketfuel_iframe_url" translate="label comment" sortOrder="1" type="select"
                        showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Rocketfuel iframe url</label>

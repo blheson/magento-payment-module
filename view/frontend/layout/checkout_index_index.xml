@@ -6,7 +6,7 @@
 
         <!--and for JS-->
         <!-- <link src="Rocketfuel_Rocketfuel::js/rocketfuel.js"/> -->
-        <link src="Rocketfuel_Rocketfuel::js/rkfl.js"/>
+        <!-- <link src="Rocketfuel_Rocketfuel::js/rkfl.js"/> -->
     </head>
     <body>
         <referenceBlock name="checkout.root">

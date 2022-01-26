@@ -32,9 +32,15 @@
                         enable: (getCode() == isChecked())
                         " disabled>
      
-                    <span data-bind="i18n: 'Pay with/on RocketFuel'"></span>
+                    <span data-bind="i18n: 'Pay with RocketFuel'">Pay with/onn RocketFuel</span>
                 </button>
             </div>
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    require(['rkfljs', 'checkoutjs'], function(thhe, hello) {
+        hello();
+    });
+</script>

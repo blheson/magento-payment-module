@@ -56,6 +56,25 @@ class Rocketfuel
     }
 
     /**
+     *  Get Email url
+     *
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->scopeConfig->getValue('payment/rocketfuel/rocketfuel_merchant_email');
+    }
+      /**
+     *  get iframe url
+     *
+     * @return string
+     */
+    public function getPassword()
+    {
+        return $this->scopeConfig->getValue('payment/rocketfuel/rocketfuel_merchant_password');
+    }
+
+    /**
      *  get serialized payload from order
      *
      * @param $order
@@ -108,6 +127,17 @@ class Rocketfuel
             $sorted[$key] = is_array($payload[$key]) ? $this->sortPayload($payload[$key]) : (string)$payload[$key];
 
         return $sorted;
+    }
+   /**
+     * custom serialize array
+     *
+     * @param $payload
+     * @return array
+     */
+    public function getEnvironment($payload)
+    {
+        return $this->scopeConfig->getValue('payment/rocketfuel/rocketfuel_environment');
+
     }
 
     protected function getEncrypted($amount, $order_id)
