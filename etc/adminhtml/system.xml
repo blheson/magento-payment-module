@@ -34,7 +34,7 @@
                     <label>Rocketfuel merchant email</label>
                     <validate></validate>
                 </field>
-                 <field id="rocketfuel_merchant_password" translate="label comment" sortOrder="1" type="text" showInDefault="1"
+                 <field id="rocketfuel_merchant_password" translate="label comment" sortOrder="1" type="password" showInDefault="1"
                        showInWebsite="1" showInStore="0">
                     <label>Rocketfuel merchant pasword</label>
                     <validate></validate>
@@ -44,6 +44,12 @@
                     <label>Rocketfuel iframe url</label>
                     <source_model>Rocketfuel\Rocketfuel\Model\UrlList</source_model>
                     <validate>no-whitespace validate-clean-url</validate>
+                </field>
+                <field id="rocketfuel_environment" translate="label comment" sortOrder="1" type="select"
+                       showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Rocketfuel Working Environment</label>
+                    <source_model>Rocketfuel\Rocketfuel\Model\EnvList</source_model>
+                    <validate>no-whitespace</validate>
                 </field>
             </group>
         </section>

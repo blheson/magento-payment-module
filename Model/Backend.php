@@ -8,6 +8,7 @@ use Rocketfuel\Rocketfuel\Api\BackendInterface;
 use Magento\Framework\App\RequestInterface;
 use Rocketfuel\Rocketfuel\Model\Rocketfuel;
 use Rocketfuel\Rocketfuel\Model\Curl;
+use Rocketfuel\Rocketfuel\Model\Order;
 
 /**
  * @api
@@ -39,6 +40,7 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
     protected $merchantId;
 
     protected $rfService;
+    protected $modelOrder;
 
     /**
      * Callback constructor.
@@ -46,17 +48,20 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      * @param OrderInterface $order
      * @param Curl $curl
      * @param \Rocketfuel\Rocketfuel\Model\Rocketfuel $rocketfuel
+     * @param \Rocketfuel\Rocketfuel\Model\Order $modelOrder
      */
     public function __construct(
         RequestInterface $request,
         OrderInterface $order,
         Curl $curl,
-        Rocketfuel $rocketfuel
+        Rocketfuel $rocketfuel,
+        Order $modelOrder
     ) {
         $this->rfService = $rocketfuel;
         $this->request = $request;
         $this->order = $order;
         $this->curl = $curl;
+        $this->modelOrder = $modelOrder;
     }
 
 
@@ -160,21 +165,37 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
             return false;
         }
     }
+
     /**
      * Validate post body
      *
      * @param $request
      * @return object
      */
-    public function getAuth()
+    public function updateOrder()
     {
+        $post = $this->validate($this->request->getPost());
+
         // $credentials = array(
         //     'email' => $this->rfService->getEmail(),
         //     'password' => $this->rfService->getPassword()
         // );
         // $response = $this->curl->auth($credentials);
 
-        echo json_encode(array('trea' => 'tea'));
-        // echo json_encode(array('trea' => 'tea', 'response' => $response));
+        echo json_encode(array('trea' =>   $post));
+    }
+    /**
+     * Validate post body
+     *
+     * @param int $orderId
+     * @return object
+     */
+    public function getAuth()
+    {
+        file_put_contents(__DIR__ . '/log.json', "\n" . 'Body Auth: ' . "\n" . 'Auth has been called' . "\n", FILE_APPEND);
+
+        $result = $this->modelOrder->processOrderWithRKFL(1);
+
+        echo json_encode(array('trea' =>   $result));
     }
 }

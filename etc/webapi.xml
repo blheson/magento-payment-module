@@ -14,14 +14,21 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
-    <route method="GET" url="/V1/rocketfuel-auth">
-        <service class="Rocketfuel\Rocketfuel\Api\BackendInterface" method="getAuth"/>
+    <route method="POST" url="/V1/rocketfuel-update-order">
+        <service class="Rocketfuel\Rocketfuel\Api\BackendInterface" method="updateOrder"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>
     </route>
+
     <route method="GET" url="/V1/rocketfuel-get-payload/:id">
         <service class="Rocketfuel\Rocketfuel\Api\BackendInterface" method="getRocketfuelPayload"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+        <route method="GET" url="/V1/rocketfuel-get-iframe-data">
+        <service class="Rocketfuel\Rocketfuel\Api\OrderInterface" method="getAuth"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>

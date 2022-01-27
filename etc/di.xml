@@ -3,4 +3,6 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Rocketfuel\Rocketfuel\Api\BackendInterface"
                 type="Rocketfuel\Rocketfuel\Model\Backend"/>
+                <preference for="Rocketfuel\Rocketfuel\Api\OrderInterface"
+                type="Rocketfuel\Rocketfuel\Model\Order"/>
 </config>

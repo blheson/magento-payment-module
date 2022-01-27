@@ -23,9 +23,17 @@ interface BackendInterface
      * @return mixed
      */
     public function getCallback();
+
+    /**
+     * callback for Update order
+     * @return mixed
+     */
+    public function updateOrder();
+
      /**
-     * callback for test GET
+     * callback for get Auth
      * @return mixed
      */
     public function getAuth();
+    
 }

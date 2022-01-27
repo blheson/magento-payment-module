@@ -12,11 +12,12 @@ class Curl
      * constructor.
      * @param MagentoCurl $curl
      */
-    public function __construct(MagentoCurl $curl){
+    public function __construct(MagentoCurl $curl)
+    {
 
         $this->curl = $curl;
         $this->curl->addHeader("Content-Type", "application/json");
-        $this->curl->addHeader("Content-Length", 200);
+        // $this->curl->addHeader("Content-Length", 200);
 
     }
     /**
@@ -24,61 +25,74 @@ class Curl
      *
      * @param array $data - Data from plugin.
      */
-    public function processPayment($data){
+    public function processPayment($data)
+    {
 
-        $response = self::auth($data);
+        $response = $this->auth($data);
+        file_put_contents(__DIR__ . '/log.json', "\n" . 'From AUth: '."\n" . $response  . "\n", FILE_APPEND);
+        $result = json_decode($response);
+        if ($result->ok !== true || !$result->result->access ) {
 
-        if (is_wp_error($response)) {
-
-            return rest_ensure_response($response);
-        }
-
-        $response_code = wp_remote_retrieve_response_code($response);
-
-        $response_body = wp_remote_retrieve_body($response);
-
-        $result = json_decode($response_body);
-        if ($response_code != '200') {
-            wc_add_notice(__('Authorization cannot be completed', 'rocketfuel-payment-gateway'), 'error');
             return false;
         }
 
-        $charge_response = self::createCharge($result->result->access, $data);
-        $charge_response_code = wp_remote_retrieve_response_code($charge_response);
-        $wp_remote_retrieve_body = wp_remote_retrieve_body($charge_response);
+      
+        if (!$result) {
 
-        if ($charge_response_code != '200') {
-            wc_add_notice(__('Could not establish an order', 'rocketfuel-payment-gateway'), 'error');
-            return false;
+            return array(
+                'success' => false, 
+                'message' => 'Authorization cannot be completed'
+            );
         }
 
-        return $wp_remote_retrieve_body;
+        $charge_response = $this->createCharge($result->result->access, $data);
+
+        file_put_contents(__DIR__ . '/log.json', "\n" . 'From createCharge: '."\n" . $charge_response . "\n", FILE_APPEND);
+        $charge_result = json_decode( $charge_response);
+
+        if (!$charge_result || $charge_result->ok === false) {
+
+            return array('success' => false, 'message' => 'Could not establish an order: '.$charge_result->message);
+        }
+
+        return  $charge_response;
     }
+
     /**
      * Process authentication
      * @param array $data
      */
-    public function auth($cred){
-        $body = json_encode($cred);
+    public function auth($data)
+    {
+        $body = json_encode($data['cred']);
         $url = $data['endpoint'] . '/auth/login';
-        $response = $this->curl->post($url, $body);
 
-        return $response;
+
+        $this->curl->post($url, $body);
+
+        $result = $this->curl->getBody();
+
+        return $result;
     }
+
     /**
      * Get UUID of the customer
      * @param array $data
      */
     public function createCharge($accessToken, $data)
     {
-        $body = json_encode($data['body']);
 
+        $body = $data['body'];
+        file_put_contents(__DIR__ . '/log.json', "\n" . 'Body Content From createCharge: '."\n" . $body  . "\n", FILE_APPEND);
         $this->curl->addHeader('authorization', "Bearer  $accessToken");
 
         $url = $data['endpoint'] . '/hosted-page';
 
-        $response =  $this->curl->post($url, $body );
+        $this->curl->post($url, $body);
 
-        return $response;
+        // output of curl request
+        $result = $this->curl->getBody();
+
+        return $result;
     }
 }

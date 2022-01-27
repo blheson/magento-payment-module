@@ -10,7 +10,6 @@ class UrlList implements \Magento\Framework\Option\ArrayInterface
         'https://iframe-stage2.rocketdemo.net',
         'https://iframe.rocketfuelblockchain.com'
     ];
-
     /**
      * {@inheritdoc}
      *
@@ -23,5 +22,18 @@ class UrlList implements \Magento\Framework\Option\ArrayInterface
             $out[] = ['value' => $iframe, 'label' => $iframe];
         }
         return $out;
+    }
+     /**
+     * {@inheritdoc}
+     *
+     * @codeCoverageIgnore
+     */
+    public function envArray()
+    {
+        return array(
+            'prod'=>'Production',
+            'stage2'=>'QA',
+            'dev'=>'Development',
+        );
     }
 }

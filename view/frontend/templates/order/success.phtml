@@ -1,5 +1,8 @@
 <?php
 $order = $block->getOrder();
+$iframeDetails = $block->processOrderWithRKFL($order->getIncrementId());
+file_put_contents(__DIR__ . '/log.json', "\n" . 'Iframe details returned' . "\n" . json_encode($iframeDetails) . "\n", FILE_APPEND);
+
 ?>
 <style>
     #rocketfuel-drag {
@@ -50,15 +53,9 @@ $order = $block->getOrder();
 </style>
 
 <div class="checkout-success">
-    <!-- <div id="rocketfuel-iframe-container">
-        <div id="rocketfuel-drag">
-            <div id="rocketfuel-dragheader"></div>
-        </div>
-        <iframe id="rocketfuel-iframe" src="<?php echo $block->getIframeUrl() ?>" onload="rocketRun(<?php echo $order->getId() ?>)">
-        </iframe>
-    </div> -->
+
     <button class="action primary">
-        <?php echo __('Pay with/success Rocketfuel') ?>
+        <?php echo __('Pay with Rocketfuel') ?>
     </button>
     <?php if ($order->getIncrementId()) : ?>
         <?php if ($block->getCustomerId()) : ?>
@@ -71,8 +68,10 @@ $order = $block->getOrder();
     <?php endif; ?>
     <input type="hidden" name="rocket_order_id" value=<?php echo $order->getId(); ?>>
     <input type="hidden" name="rocket_environment" value=<?php echo $block->getEnvironment(); ?>>
-    <input type="hidden" name="rocket_user_data" value=<?php echo $block->userData(); ?>>
-    <input type="hidden" name="rest_update_order_url" value=<?php echo $block->restUpdateOrderUrl(); ?>>
+    <input type="hidden" name="rocket_user_data" value=<?php echo $iframeDetails['userData']; ?>>
+    <input type="hidden" name="rest_update_order_url" value="/rest/">
+    <input type="hidden" name="rocket_uuid" value="<?php echo  $iframeDetails['uuid']; ?>">
+
 </div>
 <script>
     /**
@@ -99,12 +98,11 @@ $order = $block->getOrder();
         watchIframeShow: false,
 
         getUUID: function() {
-            return 'b9eb6b1f-2e0f-4b02-8b39-bdc7b73fbfbc';
+            return document.querySelector('input[name=rocket_uuid]').value;
+
         },
         getEnvironment: function() {
             let environment = document.querySelector('input[name=rocket_environment]').value;
-
-
             return environment || 'prod';
         },
         getUserData: function() {
@@ -169,9 +167,11 @@ $order = $block->getOrder();
 
             let checkIframe = setInterval(() => {
 
-                if (RocketfuelPaymentEngine.rkfl.iframeInfo.iframe) {
+                if (RocketfuelPaymentEngine.rkfl.iframeInfo.iframe){
+
                     RocketfuelPaymentEngine.rkfl.initPayment();
                     clearInterval(checkIframe);
+
                 }
 
             }, 500);
@@ -228,7 +228,7 @@ $order = $block->getOrder();
                 }
                 let userData = RocketfuelPaymentEngine.getUserData();
                 let payload, response, rkflToken;
-                // RocketfuelPaymentEngine.getAutoLoginInfo();
+
                 RocketfuelPaymentEngine.rkfl = new RocketFuel({
                     environment: RocketfuelPaymentEngine.getEnvironment()
                 });
@@ -245,6 +245,7 @@ $order = $block->getOrder();
                         }
                     }
 
+                    console.log("Payload for UserData: ", payload);
 
                     try {
                         if (RocketfuelPaymentEngine.getEnvironment() !== 'prod') { //remove signon details when testing
@@ -270,24 +271,28 @@ $order = $block->getOrder();
                             callback: RocketfuelPaymentEngine.updateOrder,
                             environment: RocketfuelPaymentEngine.getEnvironment()
                         }
+
                         if (rkflToken) {
                             rkflConfig.token = rkflToken
                         }
-                        console.log(rkflConfig);
+                        
+                        console.log("Configuration for RKFL: ",rkflConfig);
+
                         RocketfuelPaymentEngine.rkfl = new RocketFuel(rkflConfig);
+
                         resolve(true);
+
                     } catch (error) {
                         reject();
                     }
 
                 }
+
                 resolve('no auto data');
             })
 
         },
-        getAutoLoginInfo: () => {
-            console.log("Data from localstorage: ", localStorage.getItem('rkfl_token'));
-        },
+
         init: async function() {
 
             let engine = this;
