@@ -184,7 +184,7 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
         file_put_contents(__DIR__ . '/log.json', "\n" . 'Body Auth: ' . "\n" . 'Auth has been called' . "\n", FILE_APPEND);
 
         $result = $this->processOrderWithRKFL(1);
-
-        echo json_encode(array('trea' =>   $result));
+      
+        echo json_encode(array('p_key' =>     $result ));
     }
 }

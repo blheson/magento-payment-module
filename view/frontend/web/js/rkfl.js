@@ -282,9 +282,11 @@
               };
               return iframe;
             }
-          
-              //Make the DIV element draggagle:
-              dragElement();
+          document.addEventListener('DOMContentLoaded',()=>{
+  //Make the DIV element draggagle:
+  dragElement();
+          })
+            
               
               function dragElement() {
                 var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;

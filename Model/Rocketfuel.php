@@ -174,17 +174,11 @@ class Rocketfuel
 	 */
     protected function getEncrypted($to_crypt)
     {
-        // $to_crypt = json_encode([
-        //     'amount' => $amount,
-        //     'merchant_id' => $this->getMerchantId(),
-        //     'order' => $order_id
-        // ]);
-
 
         $out = '';
 
-        $cert = $this->getMerchantPublicKey();
-
+        $cert = file_get_contents(dirname(__FILE__,2) . '/key/.rf_public.key');
+        
         $public_key = openssl_pkey_get_public($cert);
 
         $key_lenght = openssl_pkey_get_details($public_key);
