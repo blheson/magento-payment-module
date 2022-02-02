@@ -66,10 +66,11 @@ file_put_contents(__DIR__ . '/log.json', "\n" . 'Iframe details returned' . "\n"
         <?php endif; ?>
         <p><?php echo __('We\'ll email you an order confirmation with details and tracking info.') ?></p>
     <?php endif; ?>
+    
     <input type="hidden" name="rocket_order_id" value=<?php echo $order->getId(); ?>>
     <input type="hidden" name="rocket_environment" value=<?php echo $block->getEnvironment(); ?>>
     <input type="hidden" name="rocket_user_data" value=<?php echo $iframeDetails['userData']; ?>>
-    <input type="hidden" name="rest_update_order_url" value="/rest/">
+    <input type="hidden" name="rest_update_order_url" value="/rest/V1/rocketfuel-update-order">
     <input type="hidden" name="rocket_uuid" value="<?php echo  $iframeDetails['uuid']; ?>">
 
 </div>
