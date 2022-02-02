@@ -29,8 +29,8 @@ class Curl
     {
 
         $response = $this->auth($data);
-        file_put_contents(__DIR__ . '/log.json', "\n" . 'From AUth: '."\n" . $response  . "\n", FILE_APPEND);
-        $result = json_decode($response);
+        // file_put_contents(__DIR__ . '/log.json', "\n" . 'From AUth: '."\n" . $response  . "\n", FILE_APPEND);
+        // $result = json_decode($response);
         if ($result->ok !== true || !$result->result->access ) {
 
             return false;
@@ -47,7 +47,7 @@ class Curl
 
         $charge_response = $this->createCharge($result->result->access, $data);
 
-        file_put_contents(__DIR__ . '/log.json', "\n" . 'From createCharge: '."\n" . $charge_response . "\n", FILE_APPEND);
+        // file_put_contents(__DIR__ . '/log.json', "\n" . 'From createCharge: '."\n" . $charge_response . "\n", FILE_APPEND);
         $charge_result = json_decode( $charge_response);
 
         if (!$charge_result || $charge_result->ok === false) {
@@ -83,7 +83,7 @@ class Curl
     {
 
         $body = $data['body'];
-        file_put_contents(__DIR__ . '/log.json', "\n" . 'Body Content From createCharge: '."\n" . $body  . "\n", FILE_APPEND);
+        // file_put_contents(__DIR__ . '/log.json', "\n" . 'Body Content From createCharge: '."\n" . $body  . "\n", FILE_APPEND);
         $this->curl->addHeader('authorization', "Bearer  $accessToken");
 
         $url = $data['endpoint'] . '/hosted-page';

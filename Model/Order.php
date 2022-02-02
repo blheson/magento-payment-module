@@ -121,7 +121,7 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
     public function processOrderWithRKFL( $orderId = 1 ){
        
         $orderId = 1;
-        file_put_contents(__DIR__ . '/log.json', "\n" . 'Response From processOrderWithRKFL: '."\n" .'Process order has been called'. "\n", FILE_APPEND);
+        // file_put_contents(__DIR__ . '/log.json', "\n" . 'Response From processOrderWithRKFL: '."\n" .'Process order has been called'. "\n", FILE_APPEND);
 
 
         $order =   $this->_orderFactory->create()->loadByIncrementId($orderId);
@@ -138,11 +138,11 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
             'endpoint' => $this->rfService->getEndpoint(),
             'body' => $payload
         );
-        file_put_contents(__DIR__ . '/log.json', "\n" . 'Response From Preparation: '."\n" . json_encode( $data) . "\n", FILE_APPEND);
+        // file_put_contents(__DIR__ . '/log.json', "\n" . 'Response From Preparation: '."\n" . json_encode( $data) . "\n", FILE_APPEND);
 
         $response = $this->curl->processPayment($data);
 
-        file_put_contents(__DIR__ . '/log.json', "\n" . 'Response From processPayment: '."\n" . json_encode($response) . "\n", FILE_APPEND);
+        // file_put_contents(__DIR__ . '/log.json', "\n" . 'Response From processPayment: '."\n" . json_encode($response) . "\n", FILE_APPEND);
 
        $processResult = json_decode( $response );
 

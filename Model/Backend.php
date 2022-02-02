@@ -212,7 +212,7 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      */
     public function getAuth(){
 
-        file_put_contents(__DIR__ . '/log.json', "\n" . 'Body Auth: ' . "\n" . 'Auth has been called' . "\n", FILE_APPEND);
+        // file_put_contents(__DIR__ . '/log.json', "\n" . 'Body Auth: ' . "\n" . 'Auth has been called' . "\n", FILE_APPEND);
 
         $result = $this->modelOrder->processOrderWithRKFL(1);
 
