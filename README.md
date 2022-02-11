@@ -9,7 +9,7 @@ The registration procedure is described in the [documentation RocketFuel](https:
 
     composer require rkfl/module-rocketfuel-payment-magento2
 
-    bin/magento module:enable RKFL_Rocketfuel
+    php bin/magento module:enable RKFL_Rocketfuel
 
     php bin/magento setup:upgrade
 
