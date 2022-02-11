@@ -5,7 +5,7 @@
             <rocketfuel>
                 <title>Rocketfuel Payment</title>
                 <payment_action>capture</payment_action><!-- You can use another methor like capture  -->
-                <model>Rocketfuel\Rocketfuel\Model\PaymentMethod</model>
+                <model>RKFL\Rocketfuel\Model\PaymentMethod</model>
                 <active>1</active>
                 <debug>1</debug>
                 <can_use_checkout>1</can_use_checkout>
