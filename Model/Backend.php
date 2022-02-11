@@ -46,8 +46,8 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      * @param RequestInterface $request
      * @param OrderInterface $order
      * @param Curl $curl
-     * @param \Rocketfuel\Rocketfuel\Model\Rocketfuel $rocketfuel
-     * @param \Rocketfuel\Rocketfuel\Model\Order $modelOrder
+     * @param \RKFL\Rocketfuel\Model\Rocketfuel $rocketfuel
+     * @param \RKFL\Rocketfuel\Model\Order $modelOrder
      */
     public function __construct(
         RequestInterface $request,
