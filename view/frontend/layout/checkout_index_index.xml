@@ -5,8 +5,8 @@
         <!--css src="Namespace_Modulename::css/my_custom.css"/-->
 
         <!--and for JS-->
-        <!-- <link src="Rocketfuel_Rocketfuel::js/rocketfuel.js"/> -->
-        <!-- <link src="Rocketfuel_Rocketfuel::js/rkfl.js"/> -->
+        <!-- <link src="RKFL_Rocketfuel::js/rocketfuel.js"/> -->
+        <!-- <link src="RKFL_Rocketfuel::js/rkfl.js"/> -->
     </head>
     <body>
         <referenceBlock name="checkout.root">
@@ -26,7 +26,7 @@
                                                             <!-- merge payment method renders here -->
                                                             <item name="children" xsi:type="array">
                                                                 <item name="rocketfuel" xsi:type="array">
-                                                                    <item name="component" xsi:type="string">Rocketfuel_Rocketfuel/js/view/payment/method-renderer</item>
+                                                                    <item name="component" xsi:type="string">RKFL_Rocketfuel/js/view/payment/method-renderer</item>
                                                                     <item name="methods" xsi:type="array">
                                                                         <item name="rocketfuel" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">false</item>

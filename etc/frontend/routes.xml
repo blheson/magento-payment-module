@@ -20,7 +20,7 @@ GNU General Public License for more details.
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
     <router id="standard">
         <route id="rocketfuel" frontName="rocketfuel">
-            <module name="Rocketfuel_Rocketfuel" />
+            <module name="RKFL_Rocketfuel" />
         </route>
     </router>
 </config>

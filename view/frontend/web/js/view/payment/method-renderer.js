@@ -11,7 +11,7 @@ define(
         rendererList.push(
             {
                 type: 'rocketfuel',
-                component: 'Rocketfuel_Rocketfuel/js/view/payment/method-renderer/rocketfuel'
+                component: 'RKFL_Rocketfuel/js/view/payment/method-renderer/rocketfuel'
             }
         );
         return Component.extend({});

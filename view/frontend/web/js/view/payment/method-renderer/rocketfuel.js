@@ -6,7 +6,7 @@ define(
         //'use strict';
         return Component.extend({
             defaults: {
-                template: 'Rocketfuel_Rocketfuel/payment/rocketfuel'
+                template: 'RKFL_Rocketfuel/payment/rocketfuel'
             }
         });
     }

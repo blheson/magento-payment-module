@@ -1,5 +1,5 @@
 # RocketFuel - RocketFuel Payment Method for Magento 2
-RocketFuel Payment Method for Magento 2 version 0.2.4
+RocketFuel Payment Method for Magento 2 version 2.0.0
 
 The registration procedure is described in the [documentation RocketFuel](https://dev.rocketdemo.net/help)
 
