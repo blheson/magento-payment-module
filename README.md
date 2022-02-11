@@ -7,16 +7,16 @@ The registration procedure is described in the [documentation RocketFuel](https:
 
 ##Installation
 
-    composer require rocketfuel/module-rocketfuel-magento2
+    composer require "rkfl/module-rocketfuel-payment-magento2
 
-    bin/magento module:enable Rocketfuel_Rocketfuel
+    bin/magento module:enable RKF:_Rocketfuel
 
     php bin/magento setup:upgrade
 
-##After it:
-- go to  https://<your_shop_url>>/<your_admin_path>/admin/system_config/
+##Configuration
+- Go to  https://<your_shop_url>>/<your_admin_path>/admin/system_config/
 - go to sales -> payment methods
 - paste your merchant id
 - paste your maerchant public key
-- set iframe
+- set environment
 - callback url should be stored in your rocketfuel merchant settings
