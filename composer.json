@@ -1,6 +1,5 @@
 {
-    "name": "rocketfuel/module-rocketfuel-payment-magento2",
-
+    "name": "rkfl/module-rocketfuel-payment-magento2",
     "description": "RocketFuel - RocketFuel Payment Method",
     "type": "magento2-module",
     "license": "MIT",
