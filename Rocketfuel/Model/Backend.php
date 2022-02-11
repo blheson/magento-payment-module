@@ -1,14 +1,14 @@
 <?php
 
-namespace Rocketfuel\Rocketfuel\Model;
+namespace RKFL\Rocketfuel\Model;
 
 use http\Exception;
 use Magento\Sales\Api\Data\OrderInterface;
-use Rocketfuel\Rocketfuel\Api\BackendInterface;
+use RKFL\Rocketfuel\Api\BackendInterface;
 use Magento\Framework\App\RequestInterface;
-use Rocketfuel\Rocketfuel\Model\Rocketfuel;
-use Rocketfuel\Rocketfuel\Model\Curl;
-use Rocketfuel\Rocketfuel\Model\Order;
+use RKFL\Rocketfuel\Model\Rocketfuel;
+use RKFL\Rocketfuel\Model\Curl;
+use RKFL\Rocketfuel\Model\Order;
 
 /**
  * @api
@@ -211,8 +211,6 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      * @return object
      */
     public function getAuth(){
-
-        // file_put_contents(__DIR__ . '/log.json', "\n" . 'Body Auth: ' . "\n" . 'Auth has been called' . "\n", FILE_APPEND);
 
         $result = $this->modelOrder->processOrderWithRKFL(1);
 

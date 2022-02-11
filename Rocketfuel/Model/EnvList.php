@@ -1,6 +1,6 @@
 <?php
 
-namespace Rocketfuel\Rocketfuel\Model;
+namespace RKFL\Rocketfuel\Model;
 
 class EnvList implements \Magento\Framework\Option\ArrayInterface
 {

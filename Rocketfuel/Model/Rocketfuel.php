@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Rocketfuel\Rocketfuel\Model;
+namespace RKFL\Rocketfuel\Model;
 
 
 class Rocketfuel

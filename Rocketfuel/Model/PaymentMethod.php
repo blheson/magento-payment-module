@@ -1,5 +1,5 @@
 <?php
-namespace Rocketfuel\Rocketfuel\Model;
+namespace RKFL\Rocketfuel\Model;
 /**
  * Pay In Store payment method model
  */

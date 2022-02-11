@@ -1,10 +1,10 @@
 <?php
 
-namespace Rocketfuel\Rocketfuel\Model;
+namespace RKFL\Rocketfuel\Model;
 
-use Rocketfuel\Rocketfuel\Model\Rocketfuel;
-use Rocketfuel\Rocketfuel\Model\Curl;
-use Rocketfuel\Rocketfuel\Api\OrderInterface;
+use RKFL\Rocketfuel\Model\Rocketfuel;
+use RKFL\Rocketfuel\Model\Curl;
+use RKFL\Rocketfuel\Api\OrderInterface;
 
 
 class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
@@ -112,17 +112,16 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
 
 
     public function getRocketfuelPayload($order){
+
         return json_encode(
             $this->rfService->getOrderPayload(
                 $order
             )
         );
+
     }
     public function processOrderWithRKFL( $orderId = 1 ){
-       
-        $orderId = 1;
-        // file_put_contents(__DIR__ . '/log.json', "\n" . 'Response From processOrderWithRKFL: '."\n" .'Process order has been called'. "\n", FILE_APPEND);
-
+    
 
         $order =   $this->_orderFactory->create()->loadByIncrementId($orderId);
 
@@ -138,11 +137,9 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
             'endpoint' => $this->rfService->getEndpoint(),
             'body' => $payload
         );
-        // file_put_contents(__DIR__ . '/log.json', "\n" . 'Response From Preparation: '."\n" . json_encode( $data) . "\n", FILE_APPEND);
 
         $response = $this->curl->processPayment($data);
 
-        // file_put_contents(__DIR__ . '/log.json', "\n" . 'Response From processPayment: '."\n" . json_encode($response) . "\n", FILE_APPEND);
 
        $processResult = json_decode( $response );
 
@@ -168,8 +165,6 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
         $resultData = array('uuid'=>$processResult->result->uuid, 'userData'=>$userData,'env'=> $this->rfService->getEnvironment() );
 
 
-        file_put_contents(__DIR__ . '/log.json', "\n" . 'Final sent result : '."\n" . json_encode( array(  $resultData  )) . "\n", FILE_APPEND);
-
 
         return $resultData;
     }
@@ -181,7 +176,7 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
      */
     public function getAuth()
     {
-        file_put_contents(__DIR__ . '/log.json', "\n" . 'Body Auth: ' . "\n" . 'Auth has been called' . "\n", FILE_APPEND);
+  
 
         $result = $this->processOrderWithRKFL(1);
       

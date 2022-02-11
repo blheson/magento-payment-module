@@ -1,5 +1,5 @@
 {
-    "name": "rocketfuel/module-rocketfuel-magento2",
+    "name": "rkfl/module-rocketfuel-magento2",
     "description": "RocketFuel - RocketFuel Payment Method",
     "type": "magento2-module",
     "license": "MIT",
@@ -20,7 +20,7 @@
     "autoload": {
         "files": [ "registration.php" ],
         "psr-4": {
-            "Rocketfuel\\Rocketfuel\\": ""
+            "RKFL\\Rocketfuel\\": ""
         }
     }
 }

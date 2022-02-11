@@ -1,6 +1,6 @@
 <?php
 
-namespace Rocketfuel\Rocketfuel\Api;
+namespace RKFL\Rocketfuel\Api;
 
 interface BackendInterface
 {
