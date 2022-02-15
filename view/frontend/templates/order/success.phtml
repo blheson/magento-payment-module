@@ -54,7 +54,7 @@ $iframeDetails = $block->processOrderWithRKFL($order->getIncrementId());
 
 <div class="checkout-success">
 
-    <button class="action primary">
+    <button class="action primary" id="rocketfuel_retrigger_payment_button">
         <?php echo __('Pay with Rocketfuel') ?>
     </button>
     <?php if ($order->getIncrementId()) : ?>
@@ -164,7 +164,7 @@ $iframeDetails = $block->processOrderWithRKFL($order->getIncrementId());
 
             }
 
-            // document.getElementById('rocketfuel_retrigger_payment_button').disabled = true;
+            document.getElementById('rocketfuel_retrigger_payment_button').disabled = true;
 
             let checkIframe = setInterval(() => {
 
@@ -184,7 +184,7 @@ $iframeDetails = $block->processOrderWithRKFL($order->getIncrementId());
             // document.getElementById('rocketfuel_before_payment').style.cssText = "visibility:hidden;height:0;width:0";
 
             //show retrigger button
-            // document.getElementById('rocketfuel_retrigger_payment_button').disabled = false;
+            document.getElementById('rocketfuel_retrigger_payment_button').disabled = false;
             // document.getElementById('rocketfuel_retrigger_payment').style.display = "block";
 
         },
@@ -205,7 +205,7 @@ $iframeDetails = $block->processOrderWithRKFL($order->getIncrementId());
 
                 switch (event.data.type) {
                     case 'rocketfuel_iframe_close':
-                        if (document.getElementById('rocketfuel_before_payment'))
+                        // if (document.getElementById('rocketfuel_before_payment'))
                             engine.prepareRetrigger();
                         break;
                     case 'rocketfuel_new_height':

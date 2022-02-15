@@ -10,7 +10,7 @@
                     <label>Callback url</label>
                     <comment>
                         <![CDATA[
-                            <h1>%your_shop_url%//rest/v1/rocketfuel-callback</h1>
+                            <h1>%your_shop_url%/rest/v1/rocketfuel-callback</h1>
                         ]]>
                     </comment>
                 </field>
