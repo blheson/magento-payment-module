@@ -2,6 +2,7 @@
 
 
 namespace RKFL\Rocketfuel\Model;
+protected $_storeManager;
 
 
 class Rocketfuel
@@ -9,9 +10,10 @@ class Rocketfuel
     const CRYPT_ALGO = 'SHA256';
 
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,\Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
         $this->scopeConfig = $scopeConfig;
+        $this->_storeManager = $storeManager;
     }
 
     /**
@@ -124,7 +126,7 @@ class Rocketfuel
         }
 
         $out['amount'] = $order->getGrandTotal();
-         $out['currency'] = "USD";
+        $out['currency'] = $this->_storeManager->getStore()->getCurrentCurrency()->getCode();
         $out['merchant_id'] = $this->getMerchantId();
         $out['order'] = $order->getId();
         $out['redirectUrl'] = '';

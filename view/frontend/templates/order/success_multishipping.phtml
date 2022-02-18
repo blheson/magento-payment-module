@@ -204,18 +204,10 @@ $iframeDetails = $block->processOrderWithRKFL($order->getIncrementId());
 
         </div>
     </div>
-    <?php if ($order->getIncrementId()) : ?>
-        <div>
-            <p>Rocketfuel Details: </p>
-            <?php if ($block->getCustomerId()) : ?>
 
-                <div>Your Order ID is: <a href="/sales/order/view/order_id/<?= $order->getIncrementId() ?>"><?= __($order->getIncrementId()) ?></a></div>
-            <?php else : ?>
-                <div>Your Order ID is: <a href="/sales/order/view/order_id/<?= $order->getIncrementId() ?>"><?= __($order->getIncrementId()) ?></a></div>
-            <?php endif; ?>
-        </div>
-        <p><?= __('We\'ll email you an order confirmation with details and tracking info.') ?></p>
-    <?php endif; ?>
+
+    <p><?= __('We\'ll email you an order confirmation with details and tracking info.') ?></p>
+
 </div>
 <script>
     /**

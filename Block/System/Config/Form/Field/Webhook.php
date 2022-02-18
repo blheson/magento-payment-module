@@ -33,7 +33,7 @@ class Webhook extends \Magento\Config\Block\System\Config\Form\Field
     /**
      * Returns element html
      *
-     * @param AbstractElement $element
+     * @param AbstractElement $element Element for admin frontend
      * @return string
      */
     protected function _getElementHtml(AbstractElement $element)
