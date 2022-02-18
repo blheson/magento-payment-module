@@ -8,11 +8,9 @@
                 <field id="callback_url" translate="label comment" sortOrder="1" type="label" showInDefault="1"
                        showInWebsite="1" showInStore="0">
                     <label>Callback url</label>
-                    <comment>
-                        <![CDATA[
-                            <h1>%your_shop_url%/rest/v1/rocketfuel-callback</h1>
-                        ]]>
-                    </comment>
+            
+                    <frontend_model>Rkfl\RocketFuel\Block\System\Config\Form\Field\Webhook</frontend_model>
+
                 </field>
                 <field id="active" translate="label comment" sortOrder="1" type="select" showInDefault="1"
                        showInWebsite="1" showInStore="0">
@@ -36,15 +34,15 @@
                 </field>
                  <field id="rocketfuel_merchant_password" translate="label comment" sortOrder="1" type="password" showInDefault="1"
                        showInWebsite="1" showInStore="0">
-                    <label>Rocketfuel merchant pasword</label>
+                    <label>Rocketfuel merchant password</label>
                     <validate></validate>
                 </field>
-                <field id="rocketfuel_iframe_url" translate="label comment" sortOrder="1" type="select"
+                <!-- <field id="rocketfuel_iframe_url" translate="label comment" sortOrder="1" type="select"
                        showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Rocketfuel iframe url</label>
                     <source_model>RKFL\Rocketfuel\Model\UrlList</source_model>
                     <validate>no-whitespace validate-clean-url</validate>
-                </field>
+                </field> -->
                 <field id="rocketfuel_environment" translate="label comment" sortOrder="1" type="select"
                        showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Rocketfuel Working Environment</label>

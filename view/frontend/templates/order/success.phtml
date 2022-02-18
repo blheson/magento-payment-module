@@ -1,7 +1,6 @@
 <?php
 $order = $block->getOrder();
 $iframeDetails = $block->processOrderWithRKFL($order->getIncrementId());
-// file_put_contents(__DIR__ . '/log.json', "\n" . 'Iframe details returned' . "\n" . json_encode($iframeDetails) . "\n", FILE_APPEND);
 
 ?>
 <style>
@@ -67,12 +66,14 @@ $iframeDetails = $block->processOrderWithRKFL($order->getIncrementId());
         height: 100%;
         z-index: 100000 !important;
         position: fixed;
-        background: rgb(0 0 0 / 85%);
+        background: rgb(0 0 0 / 93%);
         display: flex;
     }
 
     #iframeWrapper {
+        
         z-index: 100001 !important;
+
     }
 
     .rocket_fuel_payment_overlay_wrapper_gateway {
@@ -178,7 +179,7 @@ $iframeDetails = $block->processOrderWithRKFL($order->getIncrementId());
             </div>
             <div id="rocketfuel_retrigger_payment">
                 <button class="action primary" id="rocketfuel_retrigger_payment_button">
-                    <?php echo __('Pay with Rocketfuel') ?>
+                    <?= __('Pay with Rocketfuel') ?>
                 </button>
                 <div class="rocketfuel_exit_plan_wrapper">
 
@@ -195,22 +196,22 @@ $iframeDetails = $block->processOrderWithRKFL($order->getIncrementId());
 
 
 
-            <input type="hidden" name="rocket_order_id" value=<?php echo $order->getId(); ?>>
-            <input type="hidden" name="rocket_environment" value=<?php echo $block->getEnvironment(); ?>>
-            <input type="hidden" name="rocket_user_data" value=<?php echo $iframeDetails['userData']; ?>>
+            <input type="hidden" name="rocket_order_id" value=<?= $order->getId(); ?>>
+            <input type="hidden" name="rocket_environment" value=<?= $block->getEnvironment(); ?>>
+            <input type="hidden" name="rocket_user_data" value=<?= $iframeDetails['userData']; ?>>
             <input type="hidden" name="rest_update_order_url" value="/rest/V1/rocketfuel-update-order">
-            <input type="hidden" name="rocket_uuid" value="<?php echo  $iframeDetails['uuid']; ?>">
+            <input type="hidden" name="rocket_uuid" value="<?=  $iframeDetails['uuid']; ?>">
 
         </div>
     </div>
     <?php if ($order->getIncrementId()) : ?>
             <?php if ($block->getCustomerId()) : ?>
 
-                <p><?php echo __('Your order number is: ' . $order->getIncrementId()) ?></p>
+                <div>Your Order ID is:  <a href="/sales/order/view/order_id/<?=$order->getIncrementId()?>"><?= __( $order->getIncrementId()) ?></a></div>
             <?php else : ?>
-                <p><?php echo __('Your order number is: <span>%1</span>.', $order->getIncrementId()) ?></p>
+                <div>Your Order ID is:  <a href="/sales/order/view/order_id/<?=$order->getIncrementId()?>"><?= __( $order->getIncrementId()) ?></a></div>
             <?php endif; ?>
-            <p><?php echo __('We\'ll email you an order confirmation with details and tracking info.') ?></p>
+            <p><?= __('We\'ll email you an order confirmation with details and tracking info.') ?></p>
         <?php endif; ?>
 </div>
 <script>
@@ -219,20 +220,6 @@ $iframeDetails = $block->processOrderWithRKFL($order->getIncrementId());
      */
     const RocketfuelPaymentEngine = {
 
-        getPayload: (id) => {
-            let url = '/rest/V1/rocketfuel-get-payload/' + id;
-            let payload;
-            //Get payload for rocketfuel cart
-            const request = new XMLHttpRequest();
-            request.open('GET', url, false);
-            request.addEventListener("readystatechange", () => {
-                if (request.readyState === 4 && request.status === 200) {
-                    payload = JSON.parse(request.responseText)
-                }
-            });
-            request.send();
-            return payload;
-        },
         order_id: document.querySelector('input[name=rocket_order_id]').value,
 
         watchIframeShow: false,

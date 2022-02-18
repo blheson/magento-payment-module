@@ -5,7 +5,7 @@ namespace RKFL\Rocketfuel\Model;
 use RKFL\Rocketfuel\Model\Rocketfuel;
 use RKFL\Rocketfuel\Model\Curl;
 use RKFL\Rocketfuel\Api\OrderInterface;
-
+use Magento\Store\Model\Store as Store;
 
 class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
 {
@@ -32,6 +32,7 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
         \Magento\Framework\Registry $registry,
         Rocketfuel $rocketfuel,
         Curl $curl,
+        Store $store,
         array $data = []
     ) {
         parent::__construct($context, $registry, $data);
@@ -40,6 +41,7 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
         $this->_orderFactory = $orderFactory;
         $this->rfService = $rocketfuel;
         $this->curl = $curl;
+        $this->store = $store;
     }
 
     /**
@@ -93,11 +95,7 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
     public function getPaymentCode()
     {
         return 'RocketFuel';
-        //$order = $this->getOrder();
-        //$payment = $order->getPayment();
-        //$method = $payment->getMethodInstance();
-        //echo $method->getTitle();
-        //return $method->getCode();
+
     }
 
     /**
@@ -144,11 +142,9 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
        $processResult = json_decode( $response );
 
        if(  !$processResult ){
-        echo json_encode(array('success' => 'false','message'=>'There was an error in the process '  ));
 
-        return false;
+        return json_encode(array('success' => 'false','message'=>'There was an error in the process '  ));
 
-        exit();
        }
 
 
@@ -179,7 +175,14 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
   
 
         $result = $this->processOrderWithRKFL(1);
-      
-        echo json_encode(array('p_key' =>     $result ));
+
+    }
+    /**
+     * Get store url
+     * @return string
+     */
+    public function getBaseUrl()
+    {
+        return $this->store->getBaseUrl() 
     }
 }

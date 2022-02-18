@@ -7,13 +7,11 @@ $order = $block->getOrder();
         <div id="rocketfuel-drag">
             <div id="rocketfuel-dragheader"></div>
         </div>
-        <iframe id="rocketfuel-iframe" src="<?php echo $block->getIframeUrl() ?>"
-                onload="rocketRun(<?php echo $order->getId() ?>)">
-        </iframe>
+
     </div>
     <button
         class="action primary"
-        onclick="rocketRun(<?php echo $order->getId() ?>)"
+        onclick=""
     >
         <?php echo __('Pay with/on Rocketfuel') ?>
     </button>

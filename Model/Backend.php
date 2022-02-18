@@ -85,13 +85,13 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
             $order->save();
 
             //Todo response
-            echo json_encode([
+            return json_encode([
                 'status' => 'ok'
             ]);
 
         } else {
 
-            echo json_encode([
+            return json_encode([
                 'status' => 'error',
                 'signature not valid'
             ]);
@@ -165,7 +165,7 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
             return $order;
         } else {
             //todo throw exception
-            print_r('error');
+            // print_r('error');
             return false;
         }
     }
@@ -202,7 +202,7 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
 
         $order->save();
 
-        echo json_encode(array('trea' =>   $post));
+ 
     }
     /**
      * Validate post body
@@ -214,6 +214,6 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
 
         $result = $this->modelOrder->processOrderWithRKFL(1);
 
-        echo json_encode(array('trea' =>   $result));
+      
     }
 }

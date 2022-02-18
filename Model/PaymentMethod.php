@@ -12,4 +12,6 @@ class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod
      */
     protected $_code = 'rocketfuel';
    
+    protected $_canUseForMultishipping  = true;
+    protected $_isOffline = true;
 }

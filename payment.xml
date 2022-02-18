@@ -20,6 +20,11 @@ GNU General Public License for more details.
             <label>Rocketfuel</label>
         </group>
     </groups>
+    <!-- <groups>
+        <group id="offline">
+            <label>Offline Payment Methods</label>
+        </group>
+    </groups> -->
     <methods>
         <method name="rocketfuel">
             <allow_multiple_address>1</allow_multiple_address>
