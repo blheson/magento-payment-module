@@ -2,12 +2,14 @@
 
 
 namespace RKFL\Rocketfuel\Model;
-protected $_storeManager;
+
 
 
 class Rocketfuel
 {
-    const CRYPT_ALGO = 'SHA256';
+    protected const CRYPT_ALGO = 'SHA256';
+   
+    protected $_storeManager;
 
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,\Magento\Store\Model\StoreManagerInterface $storeManager
@@ -17,7 +19,7 @@ class Rocketfuel
     }
 
     /**
-     * get crypt algo
+     * Get crypt algo
      *
      * @return string
      */
@@ -27,7 +29,7 @@ class Rocketfuel
     }
 
     /**
-     *  get merchant id from settings
+     *  Get merchant id from settings
      *
      * @return string
      */
@@ -37,7 +39,7 @@ class Rocketfuel
     }
 
     /**
-     *  get merchant public key from settings
+     *  Get merchant public key from settings
      *
      * @return string
      */
@@ -70,7 +72,7 @@ class Rocketfuel
     }
   
     /**
-     *  get iframe url
+     *  Get iframe url
      *
      * @return string
      */
@@ -89,7 +91,7 @@ class Rocketfuel
         return $this->scopeConfig->getValue('payment/rocketfuel/rocketfuel_merchant_email');
     }
     /**
-     *  get iframe url
+     *  Get iframe url
      *
      * @return string
      */
@@ -99,7 +101,7 @@ class Rocketfuel
     }
 
     /**
-     *  get serialized payload from order
+     *  Get serialized payload from order
      *
      * @param $order
      * @return array
@@ -135,7 +137,7 @@ class Rocketfuel
     }
 
     /**
-     * custom serialize array
+     * Custom serialize array
      *
      * @param $payload
      * @return array
@@ -143,18 +145,23 @@ class Rocketfuel
     protected function sortPayload($payload)
     {
         $sorted = [];
-        if (is_object($payload))
+
+        if (is_object($payload)){
             $payload = (array)$payload;
+        }
+
         $keys = array_keys($payload);
+
         sort($keys);
 
-        foreach ($keys as $key)
+        foreach ($keys as $key){
             $sorted[$key] = is_array($payload[$key]) ? $this->sortPayload($payload[$key]) : (string)$payload[$key];
+        }
 
         return $sorted;
     }
     /**
-     * custom serialize array
+     * Custom serialize array
      *
      * @param $payload
      * @return array
@@ -163,12 +170,16 @@ class Rocketfuel
     {
         return $this->scopeConfig->getValue('payment/rocketfuel/rocketfuel_environment');
     }
+    /**
+     * Get Merchant Auth
+     * @return string
+     */
     public function merchantAuth()
 	{
 		return $this->getEncrypted($this->getMerchantId());
 	}
 
-    	/**
+    /**
 	 * Encrypt Data
 	 *
 	 * @param $to_crypt string to encrypt

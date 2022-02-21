@@ -1,6 +1,16 @@
 <?php
 $order = $block->getOrder();
-$iframeDetails = $block->processOrderWithRKFL($order->getIncrementId());
+ 
+if ($order->getIncrementId()) {
+
+    $iframeDetails = $block->processOrderWithRKFL($order->getIncrementId());
+
+    if (isset($iframeDetails['error'])) {
+        $iframeDetails = false;
+    }
+} else {
+    $iframeDetails = false;
+}
 
 ?>
 <style>
@@ -168,7 +178,7 @@ $iframeDetails = $block->processOrderWithRKFL($order->getIncrementId());
     }
 </style>
 <div class="checkout-success">
-    <div id="rocket_fuel_payment_overlay_gateway">
+    <div id="rocket_fuel_payment_overlay_gateway" style="display:<?= !$iframeDetails ? 'none' : ''; ?>">
         <div class="rocket_fuel_payment_overlay_wrapper_gateway">
             <div id="rocketfuel_before_payment">
                 <div class="rocketfuel_process_payment">
@@ -186,7 +196,7 @@ $iframeDetails = $block->processOrderWithRKFL($order->getIncrementId());
 
                     <a onClick="RocketfuelPaymentEngine.showFinalOrderDetails()" class="proceed-forward-rkfl" style="display: flex;align-items: center;opacity:0.4">Go back
                         &nbsp; <figure style="display: flex;align-content: center;align-items: center;">
-                            <img src="/modules/rocketfuel/assets/img/forward.svg" style="height:14px" alt="">
+                            <!-- <img src="/modules/rocketfuel/assets/img/forward.svg" style="height:14px" alt=""> -->
                         </figure>
                     </a>
 
@@ -196,26 +206,25 @@ $iframeDetails = $block->processOrderWithRKFL($order->getIncrementId());
 
 
 
-            <input type="hidden" name="rocket_order_id" value=<?= $order->getId(); ?>>
+            <input type="hidden" name="rocket_order_id" value=<?= $order->getIncrementId(); ?>>
             <input type="hidden" name="rocket_environment" value=<?= $block->getEnvironment(); ?>>
-            <input type="hidden" name="rocket_user_data" value=<?= $iframeDetails['userData']; ?>>
+            <input type="hidden" name="rocket_user_data" value=<?= $iframeDetails ? $iframeDetails['userData'] : ''; ?>>
             <input type="hidden" name="rest_update_order_url" value="/rest/V1/rocketfuel-update-order">
-            <input type="hidden" name="rocket_uuid" value="<?= $iframeDetails['uuid']; ?>">
+            <input type="hidden" name="rocket_uuid" value="<?= $iframeDetails ? $iframeDetails['uuid'] : ''; ?>">
 
         </div>
     </div>
-    <?php if ($order->getIncrementId()) : ?>
-        <div>
-            <p>Rocketfuel Details: </p>
-            <?php if ($block->getCustomerId()) : ?>
+    <?php
+    if (!$iframeDetails) {
+    ?>
+        <div style="padding-top: 35px">Notice:
+        <span style="color: #ff0000;font-weight: 800;">
+            RocketFuel Payment method is not completely configured on this store, contact store admin to complete payment
+        </span> </div>
+    <?php
+    }
+    ?>
 
-                <div>Your Order ID is: <a href="/sales/order/view/order_id/<?= $order->getIncrementId() ?>"><?= __($order->getIncrementId()) ?></a></div>
-            <?php else : ?>
-                <div>Your Order ID is: <a href="/sales/order/view/order_id/<?= $order->getIncrementId() ?>"><?= __($order->getIncrementId()) ?></a></div>
-            <?php endif; ?>
-        </div>
-        <p><?= __('We\'ll email you an order confirmation with details and tracking info.') ?></p>
-    <?php endif; ?>
 </div>
 <script>
     /**

@@ -31,8 +31,8 @@ class Curl
         $response = $this->auth($data);
 
         $result = json_decode($response);
-
-        if ($result->ok !== true || !$result->result->access ) {
+      
+        if (!isset( $result->ok) || $result->ok !== true || !$result->result->access ) {
 
             return false;
         }
@@ -72,7 +72,7 @@ class Curl
         $this->curl->post($url, $body);
 
         $result = $this->curl->getBody();
-
+        
         return $result;
     }
 

@@ -88,14 +88,12 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
             return json_encode([
                 'status' => 'ok'
             ]);
-
         } else {
 
             return json_encode([
                 'status' => 'error',
                 'signature not valid'
             ]);
-
         }
     }
 
@@ -145,7 +143,8 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      * @param $request
      * @return int
      */
-    protected function validateSignature($request){
+    protected function validateSignature($request)
+    {
 
         $public_key = openssl_pkey_get_public(
             file_get_contents(dirname(__FILE__) . '/../key/.rf_public.key')
@@ -160,8 +159,8 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
             json_encode($this->rfService->getOrderPayload($order)),
             base64_decode($request->signature),
             $public_key,
-            'SHA256')
-        ) {
+            'SHA256'
+        )) {
             return $order;
         } else {
             //todo throw exception
@@ -176,7 +175,8 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      * @param $request
      * @return object
      */
-    public function updateOrder(){
+    public function updateOrder()
+    {
 
         $post = $this->validate($this->request->getPost());
 
@@ -186,11 +186,12 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
             case '101':
                 $status = \Magento\Sales\Model\Order::STATE_PROCESSING;
                 break;
+
+            case '1':
+                $status = \Magento\Sales\Model\Order::STATE_PROCESSING; //Fix partial payment
             case '-1':
                 $status = \Magento\Sales\Model\Order::STATE_CANCELED;
                 break;
-            case '1':
-                $status = \Magento\Sales\Model\Order::STATE_PROCESSING; //Fix partial payment
             default:
                 break;
         }
@@ -201,8 +202,6 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
         $order->addStatusHistoryComment('Order has been automatically set from Rocketfuel plugin.', false);
 
         $order->save();
-
- 
     }
     /**
      * Validate post body
@@ -210,10 +209,9 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      * @param int $orderId
      * @return object
      */
-    public function getAuth(){
+    public function getAuth()
+    {
 
         $result = $this->modelOrder->processOrderWithRKFL(1);
-
-      
     }
 }

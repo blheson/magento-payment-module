@@ -5,6 +5,7 @@ namespace RKFL\Rocketfuel\Model;
  */
 class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod
 {
+     public const CODE = 'rocketfuel';
     /**
      * Payment code
      *
