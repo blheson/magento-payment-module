@@ -9,7 +9,11 @@
                        showInWebsite="1" showInStore="0">
                     <label>Callback url</label>
             
-                    <frontend_model>Rkfl\RocketFuel\Block\System\Config\Form\Field\Webhook</frontend_model>
+                       <comment>
+                        <![CDATA[
+                            <h1>{your_shop_url}/rest/V1/rocketfuel-callback</h1>
+                        ]]>
+                    </comment>
 
                 </field>
                 <field id="active" translate="label comment" sortOrder="1" type="select" showInDefault="1"
