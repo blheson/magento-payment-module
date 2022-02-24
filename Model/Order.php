@@ -52,8 +52,6 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
      */
     public function getOrder()
     {
-
-
         // $this->_order = $this->checkoutSession->getLastRealOrder();
         $this->_order = $this->_orderFactory->create()->loadByIncrementId(
             $this->checkoutSession->getLastRealOrderId()
