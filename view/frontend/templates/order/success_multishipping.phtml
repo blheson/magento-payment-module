@@ -178,6 +178,7 @@ if ($order->getIncrementId()) {
     }
 </style>
 <div class="checkout-success">
+    
     <div id="rocket_fuel_payment_overlay_gateway">
         <div class="rocket_fuel_payment_overlay_wrapper_gateway">
             <div id="rocketfuel_before_payment">
@@ -214,14 +215,19 @@ if ($order->getIncrementId()) {
 
         </div>
     </div>
-    <p><?= __('We\'ll email you an order confirmation with details and tracking info.') ?></p>
+
+    <p>
+        <?= __('We\'ll email you an order confirmation with details and tracking info.') ?>
+    </p>
+
     <?php
-    if (!$iframeDetails) {
+    if (!$iframeDetails) {  
     ?>
         <div style="padding-top: 35px">Notice:
-        <span style="color: #ff0000;font-weight: 800;">
-            RocketFuel Payment method is not completely configured on this store, contact store admin to complete payment
-        </span> </div>
+            <span style="color: #ff0000;font-weight: 800;">
+                RocketFuel Payment method is not completely configured on this store, contact store admin to complete payment
+            </span> 
+        </div>
     <?php
     }
     ?>
