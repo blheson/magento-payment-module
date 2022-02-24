@@ -8,12 +8,12 @@
                 <field id="callback_url" translate="label comment" sortOrder="1" type="label" showInDefault="1"
                        showInWebsite="1" showInStore="0">
                     <label>Callback url</label>
-            
-                       <comment>
+                    <comment>
                         <![CDATA[
                             <h1>{your_shop_url}/rest/V1/rocketfuel-callback</h1>
                         ]]>
                     </comment>
+
 
                 </field>
                 <field id="active" translate="label comment" sortOrder="1" type="select" showInDefault="1"

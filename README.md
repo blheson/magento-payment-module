@@ -19,4 +19,4 @@ The registration procedure is described in the [documentation RocketFuel](https:
 - Paste your merchant id
 - Paste your maerchant public key
 - Set environment
-- Callback url should be stored in your rocketfuel merchant settings
+- Callback url should be stored in your Rocketfuel merchant settings
