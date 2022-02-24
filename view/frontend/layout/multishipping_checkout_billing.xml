@@ -11,7 +11,7 @@
         <referenceBlock name="checkout_billing">
             <arguments>
                 <argument name="form_templates" xsi:type="array">
-                    <item name="rocketfuel" xsi:type="string">Rkfl_Rocketfuel::multishipping/form_rocketfuel.phtml</item>
+                    <item name="rocketfuel" xsi:type="string">RKFL_Rocketfuel::multishipping/form_rocketfuel.phtml</item>
                 </argument>
             </arguments>
      

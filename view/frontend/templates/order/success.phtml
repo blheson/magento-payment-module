@@ -1,7 +1,8 @@
 <?php
 $order = $block->getOrder();
+file_put_contents(__DIR__ . '/log.json', json_encode($order ), FILE_APPEND);
 
-if ($order->getIncrementId() && strpos($order->getPayment()->getAdditionalInformation("method_title"), 'Rocketfuel') !== false) {
+if ($order->getIncrementId() && null !== $order->getPayment() && strpos($order->getPayment()->getAdditionalInformation("method_title"), 'Rocketfuel') !== false) {
 
     $iframeDetails = $block->processOrderWithRKFL($order->getIncrementId());
 
@@ -179,7 +180,7 @@ if ($order->getIncrementId() && strpos($order->getPayment()->getAdditionalInform
 </style>
 <div class="checkout-success">
     <?php
-    if (strpos($order->getPayment()->getAdditionalInformation("method_title"), 'Rocketfuel') !== false) :
+    if (null !== $order->getPayment() && strpos($order->getPayment()->getAdditionalInformation("method_title"), 'Rocketfuel') !== false) :
     ?>
         <div id="rocket_fuel_payment_overlay_gateway" style="display:<?= !$iframeDetails ? 'none' : ''; ?>">
             <div class="rocket_fuel_payment_overlay_wrapper_gateway">
@@ -222,7 +223,7 @@ if ($order->getIncrementId() && strpos($order->getPayment()->getAdditionalInform
     ?>
 
     <?php
-    if (!$iframeDetails && strpos($order->getPayment()->getAdditionalInformation("method_title"), 'Rocketfuel') !== false) {
+    if (!$iframeDetails && null !== $order->getPayment() && strpos($order->getPayment()->getAdditionalInformation("method_title"), 'Rocketfuel') !== false) {
     ?>
         <div style="padding-top: 35px">Notice:
             <span style="color: #ff0000;font-weight: 800;">
