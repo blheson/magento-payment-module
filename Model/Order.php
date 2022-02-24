@@ -42,7 +42,6 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
         $this->rfService = $rocketfuel;
         $this->curl = $curl;
         $this->store = $store;
-        
     }
 
     /**
