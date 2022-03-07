@@ -5,10 +5,10 @@
 /*browser:true*/
 /*global define*/
 define([
-
+    'jquery',
     'RKFL_Rocketfuel/js/view/payment/method-renderer/rocketfuel',
 
-], function (
+], function ($,
     Component
 ) {
     'use strict';
@@ -16,6 +16,10 @@ define([
     return Component.extend({
         defaults: {
             template: 'RKFL_Rocketfuel/payment/multishipping/rocketfuel',
+        },
+        kill(){
+            $('body').trigger('contentUpdated');
         }
+        
     });
 });

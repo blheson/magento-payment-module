@@ -7,7 +7,9 @@
                 <payment_action>capture</payment_action><!-- You can use another methor like capture  -->
                 <model>RKFL\Rocketfuel\Model\PaymentMethod</model>
                 <active>1</active>
-                <debug>1</debug>
+                <allow_shipping_address_override>1</allow_shipping_address_override>
+
+                <debug>0</debug>
                 <can_use_checkout>1</can_use_checkout>
                 <can_authorize>1</can_authorize>
                 <can_capture>1</can_capture>
@@ -19,7 +21,8 @@
                 <!-- <can_review_payment>1</can_review_payment-->
                 <is_gateway>1</is_gateway>
                 <sort_order>1</sort_order>
-                <can_use_for_multishipping>1</can_use_for_multishipping>
+                <!-- <can_use_for_multishipping>1</can_use_for_multishipping> -->
+                <group>rocketfuel_group</group>
             </rocketfuel>
         </payment>
     </default>
