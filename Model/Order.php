@@ -181,7 +181,6 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
      */
     public function getAuth()
     {
-
         $result = $this->processOrderWithRKFL(1);
     }
     /**
