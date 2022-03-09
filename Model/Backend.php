@@ -96,7 +96,9 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
             ]);
         }
     }
-
+    public function getUUID(){
+        
+    }
     /**
      *  Get callback function
      *  for check exists callback url
