@@ -178,9 +178,16 @@ define(
                         'name': item.name,
                         'price': item.price,
                         'quantity': item.qty,
-                        'id': item.item_id
+                        'id': item.item_id.toString()
                     }
                 });
+                console.log('shi card',checkoutConfig.selectedShippingMethod?.amount)
+
+                if(checkoutConfig.selectedShippingMethod?.amount){
+                    cart = [...cart, { name: 'Shipping', 'quantity': 1, price: checkoutConfig.selectedShippingMethod.amount, id: new Date().getTime().toString(), }];
+                    console.log('Second card',cart)
+                }
+              
 
                 let fd = new FormData();
 
@@ -195,12 +202,14 @@ define(
                     body: fd
                 });
 
-               
 
-                let result = await response.text();
 
-                console.log('the response', result);
+                let result = await response.json();
+
+
                 let parsedJson = JSON.parse(result);
+                // let parsedJson = result;
+                console.log('the response', parsedJson);
                 if (!parsedJson.uuid) {
                     return false;
                 }
@@ -226,7 +235,6 @@ define(
                     first_name: paymentData?.firstname,
                     last_name: paymentData?.lastname,
                     email: paymentData?.email,
-                    merchant_auth: null
                 }
 
                 if (!user_data) return false;
@@ -249,10 +257,10 @@ define(
 
                     let payload, response, rkflToken;
 
-                    let iframeData = await this.iframeData(); 
+                    let iframeData = await this.iframeData();
 
-                    if(!iframeData.env || !iframeData.uuid){
-                        console.log('Iframe data is not complete');
+                    if (!iframeData.env || !iframeData.uuid) {
+                        console.log('Iframe data is not complete', iframeData);
                         return;
                     }
                     _this.rkfl = new RocketFuel({
@@ -260,9 +268,9 @@ define(
                     });
 
                     //set uuid
- // let resultAUTH = '{uuid: "502a308c-b19d-414f-a5e3-15429b41f035", merchantAuth: "CDYFO3q4wTrqgOK/afdVveZ4lQj+9kCRdNHcg9kKM0LcDeFUKC…3o57phFDjmb0TPICoM2Teq2awFJN6BTXEJ6bvot98FDsULQ==", env: "stage2", temporary-order-id: "9980e7e3c6777a6382ffc2041936ce46-71fdcdaef0"}';
+                    // let resultAUTH = '{uuid: "502a308c-b19d-414f-a5e3-15429b41f035", merchantAuth: "CDYFO3q4wTrqgOK/afdVveZ4lQj+9kCRdNHcg9kKM0LcDeFUKC…3o57phFDjmb0TPICoM2Teq2awFJN6BTXEJ6bvot98FDsULQ==", env: "stage2", temporary-order-id: "9980e7e3c6777a6382ffc2041936ce46-71fdcdaef0"}';
                     _this.rkflConfig = {
-                        uuid:iframeData.uuid,
+                        uuid: iframeData.uuid,
                         callback: _this.updateOrder,
                         environment: iframeData.env
                     }
