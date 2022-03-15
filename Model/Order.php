@@ -191,7 +191,7 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
      */
     public function getUuid()
     {
-        return true;
+        return ['let'=>'ssd'];
     }
     /**
      * Get store url

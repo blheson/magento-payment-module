@@ -38,12 +38,7 @@
         </resources>
     </route>
   
-       <route method="GET" url="/V1/rocketfuel-uuid">
-        <service class="RKFL\Rocketfuel\Api\UuidInterface" method="getUUID"/>
-        <resources>
-            <resource ref="anonymous"/>
-        </resources>
-    </route>
+
   
     <route method="GET" url="/V1/rocketfuel-get-iframe-data">
         <service class="RKFL\Rocketfuel\Api\OrderInterface" method="getAuth"/>
@@ -51,5 +46,5 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
-    
+ 
 </routes>

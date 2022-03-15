@@ -1,5 +1,5 @@
 <?php
-namespace Rkfl\Rocketfuel\Model\Ui;
+namespace RKFL\Rocketfuel\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Payment\Helper\Data as PaymentHelper;
@@ -15,7 +15,7 @@ class ConfigProvider implements ConfigProviderInterface
 
     public function __construct(PaymentHelper $paymentHelper, Store $store)
     {
-        $this->method = $paymentHelper->getMethodInstance(\Rkfl\Rocketfuel\Model\PaymentMethod::CODE);
+        $this->method = $paymentHelper->getMethodInstance(\RKFL\Rocketfuel\Model\PaymentMethod::CODE);
         $this->store = $store;
     }
 
@@ -33,7 +33,7 @@ class ConfigProvider implements ConfigProviderInterface
 
         return [
             'payment' => [
-                \Rkfl\Rocketfuel\Model\PaymentMethod::CODE => [
+                \RKFL\Rocketfuel\Model\PaymentMethod::CODE => [
                     'public_key' => $publicKey,
                     'environment' => $publicKey,
                     // 'integration_type' => $integrationType,

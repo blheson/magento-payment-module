@@ -8,7 +8,7 @@
             </argument>
         </arguments>
     </type>
-    <preference for="Rocketfuel\Rocketfuel\Api\BackendInterface"
+    <preference for="RKFL\Rocketfuel\Api\BackendInterface"
                 type="RKFL\Rocketfuel\Model\Backend"/>
     <preference for="RKFL\Rocketfuel\Api\OrderInterface"
                 type="RKFL\Rocketfuel\Model\Order"/>

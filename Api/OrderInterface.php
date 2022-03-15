@@ -9,5 +9,10 @@ interface OrderInterface{
      * @return mixed
      */
     public function getAuth();
+     /**
+     * callback for get Uuid
+     * @return mixed
+     */
+    public function getUuid();
     
 }
