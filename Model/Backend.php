@@ -179,7 +179,7 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
         }
 
 
-        $resultData = array('uuid' => $processResult->result->uuid, 'merchantAuth' => $this->rfService->merchantAuth(), 'env' => $this->rfService->getEnvironment(), 'temporary-order-id' => $payload['order']);
+        $resultData = array('uuid' => $processResult->result->uuid, 'merchantAuth' => $this->rfService->merchantAuth(), 'env' => $this->rfService->getEnvironment(), 'temporaryOrderId' => $payload['order']);
 
         file_put_contents(__DIR__ . '/log.json', "\n" . "The endpoint spew : " . json_encode($resultData), FILE_APPEND);
         return json_encode($resultData);
