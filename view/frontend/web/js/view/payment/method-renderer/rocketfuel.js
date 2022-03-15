@@ -169,7 +169,7 @@ define(
 
             },
 
-            getUUID: async function () {
+            iframeData: async function () {
 
                 // let url = document.querySelector('input[name=admin_url_rocketfuel]').value;
 
@@ -190,34 +190,29 @@ define(
 
                 console.log("The cart is :", JSON.stringify(cart));
 
-                let response = await fetch(window.location.origin+'/rest/V1/rocketfuel-post-uuid', {
+                let response = await fetch(window.location.origin + '/rest/V1/rocketfuel-post-uuid', {
                     method: 'post',
                     body: fd
                 });
+
+               
+
                 let result = await response.text();
 
                 console.log('the response', result);
-
-                // if (!response.ok) {
-                //     return false;
-                // }
-
-                // let result = await response.json();
-
-                // if (!result.data?.result?.uuid) {
-
-                //     return false;
-
-                // }
+                let parsedJson = JSON.parse(result);
+                if (!parsedJson.uuid) {
+                    return false;
+                }
 
 
 
-                // RocketfuelPaymentEngine.order_id =  (new Date()).getTime()+Math.floor((Math.random()*9999));
+
 
                 // console.log("res", result.data.result.uuid);
-
+                return parsedJson;
                 // return result.data.result.uuid;
-                return '85c25960-fa06-41c0-9210-ef38a141cbc4';
+                // return '85c25960-fa06-41c0-9210-ef38a141cbc4';
 
             },
             getUserData: function () {
@@ -254,16 +249,22 @@ define(
 
                     let payload, response, rkflToken;
 
+                    let iframeData = await this.iframeData(); 
+
+                    if(!iframeData.env || !iframeData.uuid){
+                        console.log('Iframe data is not complete');
+                        return;
+                    }
                     _this.rkfl = new RocketFuel({
-                        environment: _this.getEnvironment()
+                        environment: iframeData.env
                     });
 
-                    let uuid = await this.getUUID(); //set uuid
-
+                    //set uuid
+ // let resultAUTH = '{uuid: "502a308c-b19d-414f-a5e3-15429b41f035", merchantAuth: "CDYFO3q4wTrqgOK/afdVveZ4lQj+9kCRdNHcg9kKM0LcDeFUKC…3o57phFDjmb0TPICoM2Teq2awFJN6BTXEJ6bvot98FDsULQ==", env: "stage2", temporary-order-id: "9980e7e3c6777a6382ffc2041936ce46-71fdcdaef0"}';
                     _this.rkflConfig = {
-                        uuid,
+                        uuid:iframeData.uuid,
                         callback: _this.updateOrder,
-                        environment: _this.getEnvironment()
+                        environment: iframeData.env
                     }
 
                     if (userData.first_name && userData.email) {
@@ -272,7 +273,7 @@ define(
                             firstName: userData.first_name,
                             lastName: userData.last_name,
                             email: userData.email,
-                            merchantAuth: userData.merchant_auth,
+                            merchantAuth: iframeData.merchantAuth,
                             kycType: 'null',
                             kycDetails: {
                                 'DOB': "01-01-1990"
@@ -292,7 +293,7 @@ define(
 
                             if (!rkflToken && payload.merchantAuth) {
 
-                                response = await _this.rkfl.rkflAutoSignUp(payload, _this.getEnvironment());
+                                response = await _this.rkfl.rkflAutoSignUp(payload, iframeData.env);
 
                                 localStorage.setItem('rkfl_email', userData.email);
 
