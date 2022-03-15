@@ -29,6 +29,8 @@ define(
                 return true;
             },
             placeOrder: async function () {
+                fullScreenLoader.startLoader();
+
                 var checkoutConfig = window.checkoutConfig;
                 var paymentData = quote.billingAddress();
 
@@ -96,11 +98,13 @@ define(
                         status = "wc-failed";
                     }
 
-
-
+                    window.postMessage({ type: 'rocketfuel_place_order_action', message: true });
+                    fullScreenLoader.stopLoader();
                 } catch (error) {
 
                     console.error('Error from update order method', error);
+                    fullScreenLoader.stopLoader();
+                    engine.isPlaceOrderActionAllowed(true);
 
                 }
 
@@ -113,7 +117,42 @@ define(
                 window.addEventListener('message', (event) => {
 
                     switch (event.data.type) {
+                        case 'rocketfuel_place_order_action':
+
+                            if (event) {
+                                event.preventDefault();
+                            }
+
+                            if (
+                                additionalValidators.validate() &&
+                                engine.isPlaceOrderActionAllowed() === true
+                            ) {
+                                engine.isPlaceOrderActionAllowed(false);
+
+                                engine.getPlaceOrderDeferredObject()
+                                    .done(
+                                        function () {
+                                            fullScreenLoader.stopLoader();
+                                            // self.afterPlaceOrder();
+
+                                            // if (self.redirectAfterPlaceOrder) {
+                                            redirectOnSuccessAction.execute();
+                                            // }
+                                        }
+                                    ).always(
+                                        function () {
+                                            engine.isPlaceOrderActionAllowed(true);
+                                        }
+                                    );
+
+                                return true;
+                            }
+
+                            return false;
+                            break;
                         case 'rocketfuel_iframe_close':
+                            fullScreenLoader.stopLoader();
+                            engine.isPlaceOrderActionAllowed(true);
 
                             break;
                         case 'rocketfuel_new_height':
@@ -179,13 +218,13 @@ define(
                         'id': item.item_id.toString()
                     }
                 });
-                console.log('shi card',checkoutConfig.selectedShippingMethod?.amount)
+                console.log('shi card', checkoutConfig.selectedShippingMethod?.amount)
 
-                if(checkoutConfig.selectedShippingMethod?.amount){
+                if (checkoutConfig.selectedShippingMethod?.amount) {
                     cart = [...cart, { name: 'Shipping', 'quantity': 1, price: checkoutConfig.selectedShippingMethod.amount, id: new Date().getTime().toString(), }];
-                    console.log('Second card',cart)
+                    console.log('Second card', cart)
                 }
-              
+
 
                 let fd = new FormData();
 
