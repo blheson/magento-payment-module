@@ -2,15 +2,10 @@
 
 namespace RKFL\Rocketfuel\Api;
 
-interface OrderInterface{
+interface UuidInterface{
 
      /**
      * callback for get Auth
-     * @return mixed
-     */
-    public function getAuth();
-     /**
-     * callback for get Uuid
      * @return mixed
      */
     public function getUuid();

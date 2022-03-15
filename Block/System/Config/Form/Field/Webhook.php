@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Rkfl\Rocketfuel\Block\System\Config\Form\Field;
+namespace RKFL\Rocketfuel\Block\System\Config\Form\Field;
 
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Store\Model\Store as Store;

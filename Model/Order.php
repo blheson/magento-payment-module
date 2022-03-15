@@ -180,8 +180,17 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
      */
     public function getAuth()
     {
-
         $result = $this->processOrderWithRKFL(1);
+    }
+        /**
+     * Validate post body
+     *
+     * @param int $orderId
+     * @return object
+     */
+    public function getUuid()
+    {
+        return ['let'=>'ssd'];
     }
     /**
      * Get store url

@@ -96,7 +96,94 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
             ]);
         }
     }
+    public function getUUID()
+    {
+        $post = $this->validate($this->request->getParams(), 'get');
+        var_dump($post);
+        if (!$this->rfService->getEmail() || !$this->rfService->getPassword()) {
+            return array('error' => 'true', 'message' => 'Payment gateway not completely configured');
+        }
 
+        $credentials = array(
+            'email' => $this->rfService->getEmail(),
+            'password' => $this->rfService->getPassword()
+        );
+
+        $data = array(
+            'cred' => $credentials,
+            'endpoint' => $this->rfService->getEndpoint(),
+            'body' => $paywload
+        );
+
+        $response = $this->curl->processPayment($data);
+
+
+        $processResult = json_decode($response);
+
+        if (!$processResult) {
+
+            return array('error' => 'true', 'message' => 'There was an error in the process');
+        }
+
+        $userData = json_encode(array(
+            'first_name' => $order->getBillingAddress()->getFirstName(),
+            'last_name' => $order->getBillingAddress()->getLastName(),
+            'email' => $order->getBillingAddress()->getEmail(),
+            'merchant_auth' => $this->rfService->merchantAuth()
+        ));
+
+        $resultData = array('uuid' => $processResult->result->uuid, 'userData' => $userData, 'env' => $this->rfService->getEnvironment());
+
+        return $resultData;
+    }
+    public function postUUID()
+    {
+        $post = $this->validate($this->request->getPost());
+
+        file_put_contents(__DIR__ . '/log.json', "\n" . "Thepost : " . json_encode($post), FILE_APPEND);
+
+        if (!$this->rfService->getEmail() || !$this->rfService->getPassword()) {
+            return array('error' => true, 'message' => 'Payment gateway not completely configured');
+        }
+        if (!$post->amount || !$post->currency || !$post->cart) {
+            return array('error' => true, 'message' => 'Payment gateway not completely configured');
+        }
+        $payload = array(
+            'cart' => json_decode($post->cart),
+            'amount' => $post->amount,
+            'currency' => $post->currency,
+            'merchant_id' => $this->rfService->getMerchantId(),
+            'order' => md5(microtime()) . '-' . bin2hex(random_bytes(5))
+        );
+        $credentials = array(
+            'email' => $this->rfService->getEmail(),
+            'password' => $this->rfService->getPassword()
+        );
+ 
+
+        $data = array(
+            'cred' => $credentials,
+            'endpoint' => $this->rfService->getEndpoint(),
+            'body' => $payload
+        );
+
+        $response = $this->curl->processPayment($data);
+
+
+        $processResult = $response;
+
+        file_put_contents(__DIR__ . '/log.json', "\n" . "The result : " . json_encode($processResult), FILE_APPEND);
+        if (!$processResult) {
+
+            return array('error' => 'true', 'message' => 'There was an error in the process');
+        }
+
+
+        $resultData = array('uuid' => $processResult->result->uuid, 'merchantAuth' => $this->rfService->merchantAuth(), 'env' => $this->rfService->getEnvironment(), 'temporaryOrderId' => $payload['order']);
+
+        file_put_contents(__DIR__ . '/log.json', "\n" . "The endpoint spew : " . json_encode($resultData), FILE_APPEND);
+        return json_encode($resultData);
+    }
     /**
      *  Get callback function
      *  for check exists callback url
@@ -129,10 +216,10 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      * @param $request
      * @return object
      */
-    protected function validate($request)
+    protected function validate($request, $type = 'post')
     {
         foreach ($this->request_keys as $key) {
-            if (!array_key_exists($key, $request)) {
+            if ($type === 'post' ? !property_exists($request, $key) : !array_key_exists($key, $request)) {
                 //todo throw exception
             };
         }

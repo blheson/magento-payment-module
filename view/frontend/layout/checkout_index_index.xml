@@ -9,6 +9,11 @@
         <!-- <link src="RKFL_Rocketfuel::js/rkfl.js"/> -->
     </head>
     <body>
+     <referenceBlock name="require.js">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">RKFL_Rocketfuel::page/js/require_js.phtml</argument>
+            </action>
+        </referenceBlock> 
         <referenceBlock name="checkout.root">
             <arguments>
                 <argument name="jsLayout" xsi:type="array">
