@@ -182,7 +182,7 @@ define(
                     }
                 });
 
-                let data = JSON.parse({
+                let data = JSON.stringify({
                     'currency': checkoutConfig.totalsData.base_currency_code,
                     'amount': checkoutConfig.totalsData.base_grand_total,
                     cart
@@ -191,10 +191,7 @@ define(
                 
                 fd.append("data", data);
 
-                let response = await fetch('/V1/rocketfuel-get-uuid', {
-                    method: 'POST',
-                    body: fd
-                });
+                let response = await fetch('/V1/rocketfuel-get-uuid?data='+data);
 
                 console.log('the response', response);
 

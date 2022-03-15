@@ -183,6 +183,16 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
     {
         $result = $this->processOrderWithRKFL(1);
     }
+        /**
+     * Validate post body
+     *
+     * @param int $orderId
+     * @return object
+     */
+    public function getUuid()
+    {
+        return true;
+    }
     /**
      * Get store url
      * @return string

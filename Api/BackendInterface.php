@@ -35,5 +35,9 @@ interface BackendInterface
      * @return mixed
      */
     public function getAuth();
-    
+    /**
+     * callback for get UUID
+     * @return mixed
+     */
+    public function getUUID();
 }
