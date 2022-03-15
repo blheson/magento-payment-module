@@ -28,10 +28,10 @@ define(
             isActive: function () {
                 return true;
             },
-            placeOrder:async function(){
+            placeOrder: async function () {
                 var checkoutConfig = window.checkoutConfig;
                 var paymentData = quote.billingAddress();
-          
+
 
                 // var paystackConfiguration = checkoutConfig.payment.pstk_paystack;
 
@@ -45,7 +45,7 @@ define(
                     paymentData.email = quote.guestEmail;
                 }
 
-                
+
 
                 console.log(paymentData);
                 //     var quoteId = checkoutConfig.quoteItemData[0].quote_id;
@@ -53,7 +53,7 @@ define(
                 var _this = this;
                 _this.isPlaceOrderActionAllowed(false);
                 let results = await _this.init();
-                console.log('init',results);
+                console.log('init', results);
             },
             /**
                 * Provide redirect to page
@@ -116,10 +116,10 @@ define(
 
                     switch (event.data.type) {
                         case 'rocketfuel_iframe_close':
-                            engine.prepareRetrigger();
+ 
                             break;
                         case 'rocketfuel_new_height':
-                            engine.prepareProgressMessage();
+                 
                             engine.watchIframeShow = false;
 
                         case 'rocketfuel_result_ok':
@@ -140,11 +140,11 @@ define(
              *  @override
              */
             afterPlaceOrder: function () {
-               
+
 
                 // var checkoutConfig = window.checkoutConfig;
                 // var paymentData = quote.billingAddress();
-          
+
 
                 // // var paystackConfiguration = checkoutConfig.payment.pstk_paystack;
 
@@ -158,63 +158,77 @@ define(
                 //     paymentData.email = quote.guestEmail;
                 // }
 
-                
+
 
                 // console.log(paymentData);
                 // //     var quoteId = checkoutConfig.quoteItemData[0].quote_id;
 
                 // var _this = this;
                 // _this.isPlaceOrderActionAllowed(false);
-             
-               
+
+
             },
-         
+
             getUUID: async function () {
 
                 // let url = document.querySelector('input[name=admin_url_rocketfuel]').value;
-        
-                // let response = await fetch(url);
-        
+
+                let cart = checkoutConfig.totalsData.items.map(item => {
+                    return {
+                        'name': item.name,
+                        'price': item.price,
+                        'quantity': item.qty,
+                        'item': item.item_id
+                    }
+                });
+
+                let data = {
+                    'currency': checkoutConfig.totalsData.base_currency_code,
+                    'amount': checkoutConfig.totalsData.base_grand_total,
+                    cart
+                }
+                let response = await fetch('/V1/rocketfuel-get-uuid');
+
                 // if (!response.ok) {
                 //     return false;
                 // }
-        
+
                 // let result = await response.json();
-        
+
                 // if (!result.data?.result?.uuid) {
 
                 //     return false;
 
                 // }
-        
-              
+
+
 
                 // RocketfuelPaymentEngine.order_id =  (new Date()).getTime()+Math.floor((Math.random()*9999));
-        
+
                 // console.log("res", result.data.result.uuid);
-        
+
                 // return result.data.result.uuid;
                 return '85c25960-fa06-41c0-9210-ef38a141cbc4';
-        
+
             },
             getUserData: function () {
-                
+
                 var checkoutConfig = window.checkoutConfig;
 
                 var paymentData = quote.billingAddress();
 
-             
+
                 let user_data = {
                     first_name: paymentData?.firstname,
                     last_name: paymentData?.lastname,
                     email: paymentData?.email,
-                    merchant_auth:  null
+                    merchant_auth: null
                 }
-        
+
                 if (!user_data) return false;
-        
+
                 return user_data;
-        
+
             },
             initRocketFuel: async function () {
                 let _this = this;
@@ -297,7 +311,7 @@ define(
                     }
 
                     if (_this.rkflConfig) {
-console.log('data',_this.rkflConfig );
+                        console.log('data', _this.rkflConfig);
                         _this.rkfl = new RocketFuel(_this.rkflConfig); // init RKFL
 
                         resolve(true);
