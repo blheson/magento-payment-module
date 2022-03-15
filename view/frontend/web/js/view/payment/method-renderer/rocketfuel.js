@@ -45,8 +45,6 @@ define(
                     paymentData.email = quote.guestEmail;
                 }
 
-                
-
                 console.log(paymentData);
                 //     var quoteId = checkoutConfig.quoteItemData[0].quote_id;
 
