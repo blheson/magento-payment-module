@@ -187,7 +187,13 @@ define(
                     'amount': checkoutConfig.totalsData.base_grand_total,
                     cart
                 }
-                let response = await fetch('/V1/rocketfuel-get-uuid');
+                let fd = new FormData();
+                            fd.append("data", data);
+                           
+                let response = await fetch('/V1/rocketfuel-get-uuid',{
+                    method:'POST',
+                    body:fd
+                });
 
                 // if (!response.ok) {
                 //     return false;
