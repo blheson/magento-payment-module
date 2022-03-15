@@ -34,7 +34,10 @@ class Curl
       
         if (!isset( $result->ok) || $result->ok !== true || !$result->result->access ) {
 
-            return false;
+            return array(
+                'success' => false, 
+                'message' => 'Authorization cannot be completed'
+            );
         }
 
       
@@ -45,7 +48,7 @@ class Curl
                 'message' => 'Authorization cannot be completed'
             );
         }
-
+  
         $charge_response = $this->createCharge($result->result->access, $data);
 
         $charge_result = json_decode( $charge_response);
@@ -55,7 +58,7 @@ class Curl
             return array('success' => false, 'message' => 'Could not establish an order: '.$charge_result->message);
         }
 
-        return  $charge_response;
+        return $charge_result;
     }
 
     /**
@@ -89,12 +92,12 @@ class Curl
         $this->curl->addHeader('authorization', "Bearer  $accessToken");
 
         $url = $data['endpoint'] . '/hosted-page';
-
-        $this->curl->post($url, $body);
+ 
+        $this->curl->post($url, json_encode($body));
 
         // output of curl request
         $result = $this->curl->getBody();
-
+  
         return $result;
     }
 }

@@ -28,10 +28,10 @@ define(
             isActive: function () {
                 return true;
             },
-            placeOrder:async function(){
+            placeOrder: async function () {
                 var checkoutConfig = window.checkoutConfig;
                 var paymentData = quote.billingAddress();
-          
+
 
                 // var paystackConfiguration = checkoutConfig.payment.pstk_paystack;
 
@@ -51,7 +51,7 @@ define(
                 var _this = this;
                 _this.isPlaceOrderActionAllowed(false);
                 let results = await _this.init();
-                console.log('init',results);
+                console.log('init', results);
             },
             /**
                 * Provide redirect to page
@@ -114,10 +114,10 @@ define(
 
                     switch (event.data.type) {
                         case 'rocketfuel_iframe_close':
-                            engine.prepareRetrigger();
+
                             break;
                         case 'rocketfuel_new_height':
-                            engine.prepareProgressMessage();
+
                             engine.watchIframeShow = false;
 
                         case 'rocketfuel_result_ok':
@@ -138,11 +138,11 @@ define(
              *  @override
              */
             afterPlaceOrder: function () {
-               
+
 
                 // var checkoutConfig = window.checkoutConfig;
                 // var paymentData = quote.billingAddress();
-          
+
 
                 // // var paystackConfiguration = checkoutConfig.payment.pstk_paystack;
 
@@ -156,63 +156,89 @@ define(
                 //     paymentData.email = quote.guestEmail;
                 // }
 
-                
+
 
                 // console.log(paymentData);
                 // //     var quoteId = checkoutConfig.quoteItemData[0].quote_id;
 
                 // var _this = this;
                 // _this.isPlaceOrderActionAllowed(false);
-             
-               
+
+
             },
-         
-            getUUID: async function () {
+
+            iframeData: async function () {
 
                 // let url = document.querySelector('input[name=admin_url_rocketfuel]').value;
-        
-                // let response = await fetch(url);
-        
-                // if (!response.ok) {
-                //     return false;
-                // }
-        
-                // let result = await response.json();
-        
-                // if (!result.data?.result?.uuid) {
 
-                //     return false;
+                let cart = checkoutConfig.totalsData.items.map(item => {
+                    return {
+                        'name': item.name,
+                        'price': item.price,
+                        'quantity': item.qty,
+                        'id': item.item_id.toString()
+                    }
+                });
+                console.log('shi card',checkoutConfig.selectedShippingMethod?.amount)
 
-                // }
-        
+                if(checkoutConfig.selectedShippingMethod?.amount){
+                    cart = [...cart, { name: 'Shipping', 'quantity': 1, price: checkoutConfig.selectedShippingMethod.amount, id: new Date().getTime().toString(), }];
+                    console.log('Second card',cart)
+                }
               
 
-                // RocketfuelPaymentEngine.order_id =  (new Date()).getTime()+Math.floor((Math.random()*9999));
-        
+                let fd = new FormData();
+
+                fd.append("currency", checkoutConfig.totalsData.base_currency_code);
+                fd.append("amount", checkoutConfig.totalsData.base_grand_total);
+                fd.append("cart", JSON.stringify(cart));
+
+                console.log("The cart is :", JSON.stringify(cart));
+
+                let response = await fetch(window.location.origin + '/rest/V1/rocketfuel-post-uuid', {
+                    method: 'post',
+                    body: fd
+                });
+
+
+
+                let result = await response.json();
+
+
+                let parsedJson = JSON.parse(result);
+                // let parsedJson = result;
+                console.log('the response', parsedJson);
+                if (!parsedJson.uuid) {
+                    return false;
+                }
+
+
+
+
+
                 // console.log("res", result.data.result.uuid);
-        
+                return parsedJson;
                 // return result.data.result.uuid;
-                return '85c25960-fa06-41c0-9210-ef38a141cbc4';
-        
+                // return '85c25960-fa06-41c0-9210-ef38a141cbc4';
+
             },
             getUserData: function () {
-                
+
                 var checkoutConfig = window.checkoutConfig;
 
                 var paymentData = quote.billingAddress();
 
-             
+
                 let user_data = {
                     first_name: paymentData?.firstname,
                     last_name: paymentData?.lastname,
                     email: paymentData?.email,
-                    merchant_auth:  null
                 }
-        
+
                 if (!user_data) return false;
-        
+
                 return user_data;
-        
+
             },
             initRocketFuel: async function () {
                 let _this = this;
@@ -229,16 +255,22 @@ define(
 
                     let payload, response, rkflToken;
 
+                    let iframeData = await this.iframeData();
+
+                    if (!iframeData.env || !iframeData.uuid) {
+                        console.log('Iframe data is not complete', iframeData);
+                        return;
+                    }
                     _this.rkfl = new RocketFuel({
-                        environment: _this.getEnvironment()
+                        environment: iframeData.env
                     });
 
-                    let uuid = await this.getUUID(); //set uuid
-
+                    //set uuid
+                    // let resultAUTH = '{uuid: "502a308c-b19d-414f-a5e3-15429b41f035", merchantAuth: "CDYFO3q4wTrqgOK/afdVveZ4lQj+9kCRdNHcg9kKM0LcDeFUKC…3o57phFDjmb0TPICoM2Teq2awFJN6BTXEJ6bvot98FDsULQ==", env: "stage2", temporaryOrderId: "9980e7e3c6777a6382ffc2041936ce46-71fdcdaef0"}';
                     _this.rkflConfig = {
-                        uuid,
+                        uuid: iframeData.uuid,
                         callback: _this.updateOrder,
-                        environment: _this.getEnvironment()
+                        environment: iframeData.env
                     }
 
                     if (userData.first_name && userData.email) {
@@ -247,7 +279,7 @@ define(
                             firstName: userData.first_name,
                             lastName: userData.last_name,
                             email: userData.email,
-                            merchantAuth: userData.merchant_auth,
+                            merchantAuth: iframeData.merchantAuth,
                             kycType: 'null',
                             kycDetails: {
                                 'DOB': "01-01-1990"
@@ -267,7 +299,7 @@ define(
 
                             if (!rkflToken && payload.merchantAuth) {
 
-                                response = await _this.rkfl.rkflAutoSignUp(payload, _this.getEnvironment());
+                                response = await _this.rkfl.rkflAutoSignUp(payload, iframeData.env);
 
                                 localStorage.setItem('rkfl_email', userData.email);
 
@@ -295,7 +327,7 @@ define(
                     }
 
                     if (_this.rkflConfig) {
-console.log('data',_this.rkflConfig );
+                        console.log('data', _this.rkflConfig);
                         _this.rkfl = new RocketFuel(_this.rkflConfig); // init RKFL
 
                         resolve(true);
