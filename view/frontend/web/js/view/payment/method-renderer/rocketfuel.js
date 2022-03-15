@@ -182,16 +182,18 @@ define(
                     }
                 });
 
-                let data = JSON.stringify({
-                    'currency': checkoutConfig.totalsData.base_currency_code,
-                    'amount': checkoutConfig.totalsData.base_grand_total,
-                    cart
-                });
                 let fd = new FormData();
-                
-                fd.append("data", data);
 
-                let response = await fetch('/V1/rocketfuel-get-uuid?data='+data);
+                fd.append("currency", checkoutConfig.totalsData.base_currency_code);
+                fd.append("amount", checkoutConfig.totalsData.base_grand_total);
+                fd.append("cart", cart);
+
+                console.log("The cart is :", cart);
+
+                let response = await fetch('/V1/rocketfuel-post-uuid', {
+                    method: 'post',
+                    body: fd
+                });
 
                 console.log('the response', response);
 

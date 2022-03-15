@@ -37,9 +37,13 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
-  
 
-  
+   <route method="POST" url="/V1/rocketfuel-post-uuid">
+        <service class="RKFL\Rocketfuel\Api\BackendInterface" method="postUUID"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
     <route method="GET" url="/V1/rocketfuel-get-iframe-data">
         <service class="RKFL\Rocketfuel\Api\OrderInterface" method="getAuth"/>
         <resources>
