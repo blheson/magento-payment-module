@@ -97,7 +97,43 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
         }
     }
     public function getUUID(){
-        
+        $post = $this->validate($this->request->getPost());
+       
+        if (!$this->rfService->getEmail() || !$this->rfService->getPassword()) {
+            return array('error' => 'true', 'message' => 'Payment gateway not completely configured');
+        }
+
+        $credentials = array(
+            'email' => $this->rfService->getEmail(),
+            'password' => $this->rfService->getPassword()
+        );
+
+        $data = array(
+            'cred' => $credentials,
+            'endpoint' => $this->rfService->getEndpoint(),
+            'body' => $payload
+        );
+
+        $response = $this->curl->processPayment($data);
+
+
+        $processResult = json_decode($response);
+
+        if (!$processResult) {
+
+            return array('error' => 'true', 'message' => 'There was an error in the process');
+        }
+
+        $userData = json_encode(array(
+            'first_name' => $order->getBillingAddress()->getFirstName(),
+            'last_name' => $order->getBillingAddress()->getLastName(),
+            'email' => $order->getBillingAddress()->getEmail(),
+            'merchant_auth' => $this->rfService->merchantAuth()
+        ));
+
+        $resultData = array('uuid' => $processResult->result->uuid, 'userData' => $userData, 'env' => $this->rfService->getEnvironment());
+
+        return $resultData;
     }
     /**
      *  Get callback function
