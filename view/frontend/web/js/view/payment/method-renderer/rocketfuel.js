@@ -116,10 +116,10 @@ define(
 
                     switch (event.data.type) {
                         case 'rocketfuel_iframe_close':
- 
+
                             break;
                         case 'rocketfuel_new_height':
-                 
+
                             engine.watchIframeShow = false;
 
                         case 'rocketfuel_result_ok':
@@ -182,18 +182,21 @@ define(
                     }
                 });
 
-                let data = {
+                let data = JSON.parse({
                     'currency': checkoutConfig.totalsData.base_currency_code,
                     'amount': checkoutConfig.totalsData.base_grand_total,
                     cart
-                }
-                let fd = new FormData();
-                            fd.append("data", data);
-                           
-                let response = await fetch('/V1/rocketfuel-get-uuid',{
-                    method:'POST',
-                    body:fd
                 });
+                let fd = new FormData();
+                
+                fd.append("data", data);
+
+                let response = await fetch('/V1/rocketfuel-get-uuid', {
+                    method: 'POST',
+                    body: fd
+                });
+
+                console.log('the response', response);
 
                 // if (!response.ok) {
                 //     return false;
