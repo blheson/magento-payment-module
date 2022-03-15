@@ -178,7 +178,7 @@ define(
                         'name': item.name,
                         'price': item.price,
                         'quantity': item.qty,
-                        'item': item.item_id
+                        'id': item.item_id
                     }
                 });
 
@@ -186,16 +186,17 @@ define(
 
                 fd.append("currency", checkoutConfig.totalsData.base_currency_code);
                 fd.append("amount", checkoutConfig.totalsData.base_grand_total);
-                fd.append("cart", cart);
+                fd.append("cart", JSON.stringify(cart));
 
-                console.log("The cart is :", cart);
+                console.log("The cart is :", JSON.stringify(cart));
 
-                let response = await fetch('/V1/rocketfuel-post-uuid', {
+                let response = await fetch(window.location.origin+'/rest/V1/rocketfuel-post-uuid', {
                     method: 'post',
                     body: fd
                 });
+                let result = await response.text();
 
-                console.log('the response', response);
+                console.log('the response', result);
 
                 // if (!response.ok) {
                 //     return false;

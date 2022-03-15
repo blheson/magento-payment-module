@@ -1,6 +1,6 @@
 <?php
 $order = $block->getOrder();
-file_put_contents(__DIR__ . '/log.json', json_encode($order->getIncrementId() ), FILE_APPEND);
+file_put_contents(__DIR__ . '/log.json', "First shi ord: ".json_encode($order->getIncrementId() ), FILE_APPEND);
 if ($order->getIncrementId() && strpos($order->getPayment()->getAdditionalInformation("method_title"), 'Rocketfuel') !== false) {
 
     $iframeDetails = $block->processOrderWithRKFL($order->getIncrementId());
