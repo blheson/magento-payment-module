@@ -130,6 +130,7 @@ define(
                                 additionalValidators.validate()
                             ) {
                                 engine.isPlaceOrderActionAllowed(false);
+                                fullScreenLoader.startLoader();
 
                                 engine.getPlaceOrderDeferredObject().fail(
                                     function () {
