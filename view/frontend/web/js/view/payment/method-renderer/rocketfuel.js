@@ -24,7 +24,7 @@ define(
             defaults: {
                 template: 'RKFL_Rocketfuel/payment/rocketfuel'
             },
-            redirectAfterPlaceOrder: false,
+            redirectAfterPlaceOrder: true,
             isActive: function () {
                 return true;
             },
@@ -68,7 +68,8 @@ define(
                 let environment;
                 return environment || 'stage2';
                 // return environment || 'prod';
-            }, updateOrder: function (result) {
+            },
+            updateOrder: function (result) {
                 try {
 
                     console.log("Response from callback :", result);
@@ -119,24 +120,33 @@ define(
                     switch (event.data.type) {
                         case 'rocketfuel_place_order_action':
 
+                            console.log('rocketfuel_place_order_action has been called', additionalValidators.validate() );
+
                             if (event) {
                                 event.preventDefault();
                             }
 
                             if (
-                                additionalValidators.validate() &&
-                                engine.isPlaceOrderActionAllowed() === true
+                                additionalValidators.validate()
                             ) {
                                 engine.isPlaceOrderActionAllowed(false);
 
-                                engine.getPlaceOrderDeferredObject()
+                                engine.getPlaceOrderDeferredObject().fail(
+                                    function () {
+                                        console.log('Fail ');
+
+                                        engine.isPlaceOrderActionAllowed(true);
+                                    }
+                                )
                                     .done(
                                         function () {
-                                            fullScreenLoader.stopLoader();
+
+                                            // fullScreenLoader.stopLoader();
                                             // self.afterPlaceOrder();
+                                            console.log('redirect has been raised');
 
                                             // if (self.redirectAfterPlaceOrder) {
-                                            redirectOnSuccessAction.execute();
+                                            console.log('redirect', redirectOnSuccessAction.execute());
                                             // }
                                         }
                                     ).always(
@@ -160,7 +170,7 @@ define(
                             engine.watchIframeShow = false;
 
                         case 'rocketfuel_result_ok':
-
+                            fullScreenLoader.stopLoader();
                             console.log('Event from rocketfuel_result_ok', event.data.response);
 
                             if (event.data.response) {
@@ -173,38 +183,7 @@ define(
 
                 })
             },
-            /**
-             *  @override
-             */
-            afterPlaceOrder: function () {
 
-
-                // var checkoutConfig = window.checkoutConfig;
-                // var paymentData = quote.billingAddress();
-
-
-                // // var paystackConfiguration = checkoutConfig.payment.pstk_paystack;
-
-                // // if (paystackConfiguration.integration_type == 'standard') {
-                // //     this.redirectToCustomAction(paystackConfiguration.integration_type_standard_url);
-                // // } else {
-                // if (checkoutConfig.isCustomerLoggedIn) {
-                //     var customerData = checkoutConfig.customerData;
-                //     paymentData.email = customerData.email;
-                // } else {
-                //     paymentData.email = quote.guestEmail;
-                // }
-
-
-
-                // console.log(paymentData);
-                // //     var quoteId = checkoutConfig.quoteItemData[0].quote_id;
-
-                // var _this = this;
-                // _this.isPlaceOrderActionAllowed(false);
-
-
-            },
 
             iframeData: async function () {
 
@@ -267,11 +246,37 @@ define(
 
                 var paymentData = quote.billingAddress();
 
+                // var paystackConfiguration = checkoutConfig.payment.pstk_paystack;
 
-                let user_data = {
-                    first_name: paymentData?.firstname,
-                    last_name: paymentData?.lastname,
-                    email: paymentData?.email,
+                // if (paystackConfiguration.integration_type == 'standard') {
+                //     this.redirectToCustomAction(paystackConfiguration.integration_type_standard_url);
+                // } else {
+
+                console.log('paymentData', paymentData);
+
+                let user_data;
+
+                if (checkoutConfig.isCustomerLoggedIn) {
+                    var customerData = checkoutConfig.customerData;
+
+                    paymentData.email = customerData.email;
+
+                    user_data = {
+                        first_name: customerData?.firstname || paymentData?.firstname,
+                        last_name: customerData?.lastname || paymentData?.lastname,
+                        email: customerData?.email || quote?.guestEmail,
+                    }
+
+                } else {
+
+                    var paymentData = quote.billingAddress();
+
+                    user_data = {
+                        first_name: paymentData?.firstname,
+                        last_name: paymentData?.lastname,
+                        email: paymentData?.email || quote?.guestEmail,
+                    }
+
                 }
 
                 if (!user_data) return false;
@@ -419,4 +424,4 @@ define(
     }
 );
 
-console.log('shoswn');
+console.log('shooon');
