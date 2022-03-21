@@ -98,9 +98,9 @@ define(
                     if (result_status === -1) {
                         status = "wc-failed";
                     }
-
-                    window.postMessage({ type: 'rocketfuel_place_order_action', message: true });
                     fullScreenLoader.stopLoader();
+                    window.postMessage({ type: 'rocketfuel_place_order_action', message: true });
+
                 } catch (error) {
 
                     console.error('Error from update order method', error);
@@ -120,7 +120,8 @@ define(
                     switch (event.data.type) {
                         case 'rocketfuel_place_order_action':
 
-                            console.log('rocketfuel_place_order_action has been called', additionalValidators.validate() );
+                            console.log('rocketfuel_place_order_action has been called', additionalValidators.validate());
+                            fullScreenLoader.startLoader();
 
                             if (event) {
                                 event.preventDefault();
@@ -137,6 +138,8 @@ define(
                                         console.log('Fail ');
 
                                         engine.isPlaceOrderActionAllowed(true);
+                                        fullScreenLoader.stopLoader();
+
                                     }
                                 )
                                     .done(
