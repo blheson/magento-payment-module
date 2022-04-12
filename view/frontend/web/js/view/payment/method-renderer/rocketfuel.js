@@ -35,10 +35,11 @@ define(
             },
             placeOrder: async function (data, event) {
                 var _this = this;
+
                 if (_this.placeOrderClicked === true) return;
                 // var self = this;
                 console.count("I am called", _this.placeOrderClicked);
-              
+
                 _this.placeOrderClicked = true;
 
                 if (event) {
@@ -341,11 +342,11 @@ define(
 
                 return new Promise(async (resolve, reject) => {
                     try {
-
+                        if (engine.isPlaceOrderActionAllowed() === false) return;
                         let res = await engine.initRocketFuel();
 
-                        console.log("Init rkfl", res);
-
+                      
+                        engine.isPlaceOrderActionAllowed(false);
                         window.addEventListener('message', (event) => {
                             switch (event.data.type) {
                                 case 'rocketfuel_iframe_close':
@@ -358,10 +359,9 @@ define(
                                         engine.placingOrder = true;
                                         // engine.isPlaceOrderActionAllowed(false);
 
-                                        if (additionalValidators.validate() &&
-                                            engine.isPlaceOrderActionAllowed() === true
+                                        if (additionalValidators.validate()
                                         ) {
-                                            engine.isPlaceOrderActionAllowed(false);
+
 
                                             engine.getPlaceOrderDeferredObject()
                                                 .done(
@@ -385,6 +385,7 @@ define(
                                         }
                                     } else {
                                         fullScreenLoader.stopLoader();
+                                        engine.isPlaceOrderActionAllowed(true);
 
                                         resolve(false);
                                     }
@@ -429,4 +430,4 @@ define(
     }
 );
 
-console.log('Shwoer 4');
+console.log('Shwoer 5');
