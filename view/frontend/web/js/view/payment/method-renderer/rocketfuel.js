@@ -24,20 +24,26 @@ define(
             defaults: {
                 template: 'RKFL_Rocketfuel/payment/rocketfuel'
             },
-            redirectAfterPlaceOrder: false,
+            redirectAfterPlaceOrder: true,
+            theObject: function () {
+                return this;
+            },
+            placingOrder: false,
             isActive: function () {
                 return true;
             },
-            placeOrder: async function () {
+            placeOrder: async function (data, event) {
+                // var self = this;
+                var _this = this;
+                if (event) {
+                    event.preventDefault();
+                }
+
                 var checkoutConfig = window.checkoutConfig;
                 var paymentData = quote.billingAddress();
 
+                // fullScreenLoader.startLoader();
 
-                // var paystackConfiguration = checkoutConfig.payment.pstk_paystack;
-
-                // if (paystackConfiguration.integration_type == 'standard') {
-                //     this.redirectToCustomAction(paystackConfiguration.integration_type_standard_url);
-                // } else {
                 if (checkoutConfig.isCustomerLoggedIn) {
                     var customerData = checkoutConfig.customerData;
                     paymentData.email = customerData.email;
@@ -45,41 +51,33 @@ define(
                     paymentData.email = quote.guestEmail;
                 }
 
-
-
                 console.log(paymentData);
                 //     var quoteId = checkoutConfig.quoteItemData[0].quote_id;
 
-                var _this = this;
                 _this.isPlaceOrderActionAllowed(false);
-                let results = await _this.init();
-                console.log('init', results);
-            },
-            /**
-                * Provide redirect to page
-                */
-            redirectToCustomAction: function (url) {
-                fullScreenLoader.startLoader();
-                window.location.replace(mageUrl.build(url));
-            },
-            getEnvironment: function () {
-                var checkoutConfig = window.checkoutConfig;
 
-                let environment;
-                return environment || 'stage2';
-                // return environment || 'prod';
-            }, updateOrder: function (result) {
+                let results = await _this.init();
+
+                console.log('init', results);
+
+                // return _this.customplaceOrder();
+
+                return true;
+            },
+      
+            updateOrder: function (result) {
                 try {
 
                     console.log("Response from callback :", result);
 
-                    console.log("order_id :", this.order_id);
+
 
                     let status = "wc-on-hold";
 
                     if (result?.status === undefined) {
                         return false;
                     }
+                    fullScreenLoader.stopLoader();
 
                     let result_status = parseInt(result.status);
 
@@ -98,8 +96,8 @@ define(
                         status = "wc-failed";
                     }
 
-
-
+                    // redirectOnSuccessAction.execute();
+                    // window.postMessage({ type: 'rocketfuel_data_update_custom_sdk', response: true });
                 } catch (error) {
 
                     console.error('Error from update order method', error);
@@ -115,7 +113,46 @@ define(
                 window.addEventListener('message', (event) => {
 
                     switch (event.data.type) {
+                        case 'rocketfuel_data_update_custom_sdk':
+                            console.log('Event from rocketfuel_data_update_custom_sdk', event.data.response);
+
+
                         case 'rocketfuel_iframe_close':
+                            console.log('closed');
+                            engine.isPlaceOrderActionAllowed(true);
+                            // engine.messageContainer.addErrorMessage({
+                            //     message: "iFrame closed"
+                            // });
+                            if (event.data.paymentCompleted === 1) {
+                                if (engine.placingOrder === true) return;
+                                console.log('This is closed and also validating');
+                                engine.placingOrder = true;
+                                if (additionalValidators.validate() &&
+                                    engine.isPlaceOrderActionAllowed() === true
+                                ) {
+                                    engine.isPlaceOrderActionAllowed(false);
+
+                                    engine.getPlaceOrderDeferredObject()
+                                        .done(
+                                            function () {
+                                                // self.afterPlaceOrder();
+
+                                                // if (self.redirectAfterPlaceOrder) {
+                                                redirectOnSuccessAction.execute();
+                                                // }
+                                            }
+                                        ).always(
+                                            function () {
+                                                engine.isPlaceOrderActionAllowed(true);
+                                            }
+                                        );
+
+                                    return true;
+                                }
+                            }
+                         
+                            fullScreenLoader.stopLoader();
+                            engine.placingOrder = false;
 
                             break;
                         case 'rocketfuel_new_height':
@@ -139,32 +176,14 @@ define(
             /**
              *  @override
              */
-            afterPlaceOrder: function () {
+             customOrders: async function () {
 
 
-                // var checkoutConfig = window.checkoutConfig;
-                // var paymentData = quote.billingAddress();
-
-
-                // // var paystackConfiguration = checkoutConfig.payment.pstk_paystack;
-
-                // // if (paystackConfiguration.integration_type == 'standard') {
-                // //     this.redirectToCustomAction(paystackConfiguration.integration_type_standard_url);
-                // // } else {
-                // if (checkoutConfig.isCustomerLoggedIn) {
-                //     var customerData = checkoutConfig.customerData;
-                //     paymentData.email = customerData.email;
-                // } else {
-                //     paymentData.email = quote.guestEmail;
-                // }
-
-
-
-                // console.log(paymentData);
-                // //     var quoteId = checkoutConfig.quoteItemData[0].quote_id;
-
-                // var _this = this;
-                // _this.isPlaceOrderActionAllowed(false);
+            },
+            /**
+             *  @override
+             */
+            afterPlaceOrders: async function () {
 
 
             },
@@ -172,8 +191,9 @@ define(
             iframeData: async function () {
 
                 // let url = document.querySelector('input[name=admin_url_rocketfuel]').value;
-
+                let productTotal = 0;
                 let cart = checkoutConfig.totalsData.items.map(item => {
+                    productTotal += item.price;
                     return {
                         'name': item.name,
                         'price': item.price,
@@ -181,18 +201,21 @@ define(
                         'id': item.item_id.toString()
                     }
                 });
-                console.log('shi card',checkoutConfig.selectedShippingMethod?.amount)
+                console.log('shi card', checkoutConfig.selectedShippingMethod?.amount)
 
-                if(checkoutConfig.selectedShippingMethod?.amount){
-                    cart = [...cart, { name: 'Shipping', 'quantity': 1, price: checkoutConfig.selectedShippingMethod.amount, id: new Date().getTime().toString(), }];
-                    console.log('Second card',cart)
+                if (checkoutConfig.selectedShippingMethod?.amount || (checkoutConfig.totalsData.base_grand_total - productTotal > 0)) {
+                    cart = [...cart, { name: 'Shipping', 'quantity': 1, price: checkoutConfig.selectedShippingMethod?.amount || productTotal, id: new Date().getTime().toString(), }];
                 }
-              
+
+
+                console.log('Second card', cart);
 
                 let fd = new FormData();
 
                 fd.append("currency", checkoutConfig.totalsData.base_currency_code);
+
                 fd.append("amount", checkoutConfig.totalsData.base_grand_total);
+
                 fd.append("cart", JSON.stringify(cart));
 
                 console.log("The cart is :", JSON.stringify(cart));
@@ -202,25 +225,18 @@ define(
                     body: fd
                 });
 
-
-
                 let result = await response.json();
-
 
                 let parsedJson = JSON.parse(result);
                 // let parsedJson = result;
                 console.log('the response', parsedJson);
+
                 if (!parsedJson.uuid) {
                     return false;
                 }
 
-
-
-
-
                 // console.log("res", result.data.result.uuid);
                 return parsedJson;
-                // return result.data.result.uuid;
                 // return '85c25960-fa06-41c0-9210-ef38a141cbc4';
 
             },
@@ -268,7 +284,7 @@ define(
                     });
 
                     //set uuid
-                    // let resultAUTH = '{uuid: "502a308c-b19d-414f-a5e3-15429b41f035", merchantAuth: "CDYFO3q4wTrqgOK/afdVveZ4lQj+9kCRdNHcg9kKM0LcDeFUKC…3o57phFDjmb0TPICoM2Teq2awFJN6BTXEJ6bvot98FDsULQ==", env: "stage2", temporaryOrderId: "9980e7e3c6777a6382ffc2041936ce46-71fdcdaef0"}';
+                    // let resultAUTH = '{uuid: "502a308c-b19d-414f-a5e3-15429b41f035", merchantAuth: "CDYFO3q4wTrqgOK/afdVveZ4lQj+9kCRdNHcg9kKM0LcDeFUKC…3o57phFDjmb0TPICoM2Teq2awFJN6BTXEJ6bvot98FDsULQ==", env: "stage2", temporary-order-id: "9980e7e3c6777a6382ffc2041936ce46-71fdcdaef0"}';
                     _this.rkflConfig = {
                         uuid: iframeData.uuid,
                         callback: _this.updateOrder,
@@ -382,4 +398,4 @@ define(
     }
 );
 
-console.log('shoswn');
+console.log('Shwoer 2');
