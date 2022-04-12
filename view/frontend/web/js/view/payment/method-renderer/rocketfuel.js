@@ -34,11 +34,11 @@ define(
                 return true;
             },
             placeOrder: async function (data, event) {
-              
+                var _this = this;
                 if (_this.placeOrderClicked === true) return;
                 // var self = this;
                 console.count("I am called", _this.placeOrderClicked);
-                var _this = this;
+              
                 _this.placeOrderClicked = true;
 
                 if (event) {
