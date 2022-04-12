@@ -63,9 +63,8 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
         $this->modelOrder = $modelOrder;
     }
 
-
     /**
-     * api callback endpoint
+     * Api callback endpoint
      *
      * @return mixed
      */
@@ -136,8 +135,8 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
 
         return $resultData;
     }
-    public function postUUID()
-    {
+    public function postUUID(){
+
         $post = $this->validate($this->request->getPost());
 
         file_put_contents(__DIR__ . '/log.json', "\n" . "Thepost : " . json_encode($post), FILE_APPEND);
@@ -262,8 +261,7 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      * @param $request
      * @return object
      */
-    public function updateOrder()
-    {
+    public function updateOrder(){
 
         $post = $this->validate($this->request->getPost());
 
@@ -273,12 +271,10 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
             case '101':
                 $status = \Magento\Sales\Model\Order::STATE_PROCESSING;
                 break;
-
             case '1':
                 $status = \Magento\Sales\Model\Order::STATE_PROCESSING; //Fix partial payment
             case '-1':
                 $status = \Magento\Sales\Model\Order::STATE_CANCELED;
-                break;
             default:
                 break;
         }

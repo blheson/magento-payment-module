@@ -11,7 +11,7 @@ interface BackendInterface
     public function postCallback();
 
     /**
-     * get order payload for rocketfuel extension
+     * Get order payload for rocketfuel extension
      *
      * @param $id
      * @return array|false|string
@@ -40,8 +40,8 @@ interface BackendInterface
      * @return mixed
      */
     public function getUUID();
-       /**
-     * callback for get UUID
+    /**
+     * callback for post UUID
      * @return mixed
      */
     public function postUUID();

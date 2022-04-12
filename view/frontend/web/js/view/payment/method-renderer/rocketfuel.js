@@ -101,6 +101,8 @@ define(
                 } catch (error) {
 
                     console.error('Error from update order method', error);
+                    fullScreenLoader.stopLoader();
+                    engine.isPlaceOrderActionAllowed(true);
 
                 }
 
@@ -160,7 +162,7 @@ define(
                             engine.watchIframeShow = false;
 
                         case 'rocketfuel_result_ok':
-
+                            fullScreenLoader.stopLoader();
                             console.log('Event from rocketfuel_result_ok', event.data.response);
 
                             if (event.data.response) {
@@ -246,11 +248,37 @@ define(
 
                 var paymentData = quote.billingAddress();
 
+                // var paystackConfiguration = checkoutConfig.payment.pstk_paystack;
 
-                let user_data = {
-                    first_name: paymentData?.firstname,
-                    last_name: paymentData?.lastname,
-                    email: paymentData?.email,
+                // if (paystackConfiguration.integration_type == 'standard') {
+                //     this.redirectToCustomAction(paystackConfiguration.integration_type_standard_url);
+                // } else {
+
+                console.log('paymentData', paymentData);
+
+                let user_data;
+
+                if (checkoutConfig.isCustomerLoggedIn) {
+                    var customerData = checkoutConfig.customerData;
+
+                    paymentData.email = customerData.email;
+
+                    user_data = {
+                        first_name: customerData?.firstname || paymentData?.firstname,
+                        last_name: customerData?.lastname || paymentData?.lastname,
+                        email: customerData?.email || quote?.guestEmail,
+                    }
+
+                } else {
+
+                    var paymentData = quote.billingAddress();
+
+                    user_data = {
+                        first_name: paymentData?.firstname,
+                        last_name: paymentData?.lastname,
+                        email: paymentData?.email || quote?.guestEmail,
+                    }
+
                 }
 
                 if (!user_data) return false;
