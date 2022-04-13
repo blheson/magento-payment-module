@@ -23,7 +23,7 @@
         <div class="actions-toolbar">
        
             <div class="primary">
-                <button class="action primary checkout" type="submit" data-bind="
+                <button class="action primary checkout" id="rocketfuel-place-order"  type="submit" data-bind="
                         click: placeOrder,
                         attr: {title: $t('Place Order')},
                         css: {disabled: !isPlaceOrderActionAllowed()},
@@ -31,7 +31,7 @@
                         " disabled>
 
                     
-                    <span data-bind="i18n: 'Pay and Place order with RocketFuel'"></span>
+                    <span id="rocketfuel-place-order" data-bind="i18n: 'Pay and Place order with RocketFuel'"></span>
 
                 </button>
             </div>
