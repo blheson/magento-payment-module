@@ -33,29 +33,49 @@ define(
             isActive: function () {
                 return true;
             },
+
+            removeLoader: function (status) {
+                if (status) {
+                    document.getElementById('rocketfuel-place-order').querySelector('span').innerText = 'Pay and Place order with RocketFuel';
+
+                    if (document.getElementById('loader-rocket-element'))
+                        document.getElementById('loader-rocket-element').remove();
+
+                } else {
+                    document.getElementById('rocketfuel-place-order').querySelector('span').innerText = '';
+                    let rotate = document.createElement('div');
+
+                    rotate.classList.add('loader-rocket');
+                    rotate.id = 'loader-rocket-element';
+
+                    document.getElementById('rocketfuel-place-order').appendChild(rotate);
+
+                }
+
+            },
             placeOrder: async function (data, event) {
-                var _this = this;
+                var engine = this;
 
-                if (_this.placeOrderClicked === true) return;
+                if (engine.placeOrderClicked === true) return;
                 // var self = this;
-                console.count("I am called", _this.placeOrderClicked);
+                console.count("I am called", engine.placeOrderClicked);
+
+                if (!document.getElementById('rocket-style')) {
+
+                    let rocketStyle = document.createElement('style');
+
+                    rocketStyle.id = 'rocket-style';
+
+                    rocketStyle.innerText = ".loader-rocket {border: 1px solid #000000;border-top: 1px solid #ffffff;border-radius: 50%;width: 20px;height: 20px;animation: spin 0.4s linear infinite;}@keyframes spin {0% {transform: rotate(0deg);}100% {transform: rotate(360deg);}}";
+
+                    document.body.appendChild(rocketStyle);
+                }
+
+                document.getElementById('rocketfuel-place-order').disabled = true;
 
 
-                let rocketStyle = document.createElement('style');
-
-                rocketStyle.innerText = ".loader_rocket {border: 1px solid #000000;border-top: 1px solid #ffffff;border-radius: 50%;width: 20px;height: 20px;animation: spin 0.4s linear infinite;}@keyframes spin {0% {transform: rotate(0deg);}100% {transform: rotate(360deg);}}"
-
-                document.body.appendChild(rocketStyle);
-
-
-                let rotate = document.createElement('div');
-
-                rotate.classList.add('rocket-loader');
-
-                document.getElementById('rocketfuel-place-order').appendChild(rotate);
-
-
-                _this.placeOrderClicked = true;
+                engine.removeLoader(false);
+                engine.placeOrderClicked = true;
 
                 if (event) {
                     event.preventDefault();
@@ -76,38 +96,32 @@ define(
                 //     var quoteId = checkoutConfig.quoteItemData[0].quote_id;
 
                 try {
-                    let results = await _this.init();
+                    let results = await engine.init();
 
                     if (results === false) {
 
                         console.log('engineplacingOrder trturen to false');
 
-                        _this.placingOrder = false;
+                        engine.placingOrder = false;
 
-                        _this.placeOrderClicked = false;
-                        try {
-                            document.getElementById('rocketfuel-place-order').remove();
-                        } catch (error) {
+                        engine.placeOrderClicked = false;
+                        engine.removeLoader(true)
 
-                        }
                     }
 
                     console.log('Response from init', results);
 
-                    // return _this.customplaceOrder();
+                    // return engine.customplaceOrder();
 
                     return results;
 
                 } catch (error) {
-                    _this.placingOrder = false;
+                    engine.placingOrder = false;
 
-                    _this.placeOrderClicked = false;
+                    engine.placeOrderClicked = false;
                     console.error("There was an error with the place order flow,", error?.message);
-                    try {
-                        document.getElementById('rocketfuel-place-order').remove();
-                    } catch (error) {
+                    engine.removeLoader(true)
 
-                    }
 
 
                 }
@@ -166,7 +180,7 @@ define(
                         case 'rocketfuel_new_height':
 
                             engine.watchIframeShow = false;
-
+                            engine.removeLoader(true);
                         case 'rocketfuel_result_ok':
 
 
@@ -262,9 +276,10 @@ define(
 
                 return user_data;
 
-            },
+            }
+            ,
             initRocketFuel: async function () {
-                let _this = this;
+                let engine = this;
                 return new Promise(async (resolve, reject) => {
 
                     if (!RocketFuel) {
@@ -274,7 +289,7 @@ define(
 
                     document.getElementById('iframeWrapper').style.position = 'fixed';
 
-                    let userData = _this.getUserData();
+                    let userData = engine.getUserData();
 
 
                     let payload, response, rkflToken;
@@ -285,15 +300,15 @@ define(
                         console.log('Iframe data is not complete', iframeData);
                         return;
                     }
-                    _this.rkfl = new RocketFuel({
+                    engine.rkfl = new RocketFuel({
                         environment: iframeData.env
                     });
 
                     //set uuid
 
-                    _this.rkflConfig = {
+                    engine.rkflConfig = {
                         uuid: iframeData.uuid,
-                        callback: _this.updateOrder,
+                        callback: engine.updateOrder,
                         environment: iframeData.env
                     }
 
@@ -323,7 +338,7 @@ define(
 
                             if (!rkflToken && payload.merchantAuth) {
 
-                                response = await _this.rkfl.rkflAutoSignUp(payload, iframeData.env);
+                                response = await engine.rkfl.rkflAutoSignUp(payload, iframeData.env);
 
                                 localStorage.setItem('rkfl_email', userData.email);
 
@@ -337,7 +352,7 @@ define(
 
 
                             if (rkflToken) {
-                                _this.rkflConfig.token = rkflToken;
+                                engine.rkflConfig.token = rkflToken;
                             }
 
                             resolve(true);
@@ -350,9 +365,9 @@ define(
 
                     }
 
-                    if (_this.rkflConfig) {
+                    if (engine.rkflConfig) {
 
-                        _this.rkfl = new RocketFuel(_this.rkflConfig); // init RKFL
+                        engine.rkfl = new RocketFuel(engine.rkflConfig); // init RKFL
 
                         resolve(true);
 
@@ -402,30 +417,25 @@ define(
                                                     function () {
                                                         console.log('always')
                                                         engine.isPlaceOrderActionAllowed(true);
-                                                        try {
-                                                            document.getElementById('rocketfuel-place-order').remove();
-                                                        } catch (error) {
-
-                                                        }
+                                                        engine.removeLoader(true)
                                                     }
                                                 );
 
                                             resolve(true);
                                             return;
+                                        } else {
+                                            console.log('Not validated');
+
+                                            resolve(false);
+
                                         }
                                     } else {
                                         fullScreenLoader.stopLoader();
                                         engine.isPlaceOrderActionAllowed(true);
-                                        try {
-                                            document.getElementById('rocketfuel-place-order').remove();
-                                        } catch (error) {
+                                        engine.removeLoader(true)
 
-                                        }
                                         resolve(false);
                                     }
-
-
-
                             }
 
 
