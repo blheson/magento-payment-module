@@ -448,6 +448,7 @@ define(
                     }
 
                     console.log('Done initiating RKFL');
+                    document.getElementById('rocketfuel-place-order').disabled = false;
 
                     engine.windowListener();
 
