@@ -246,6 +246,7 @@ define(
                         location.reload();
                         reject();
                     }
+                    document.getElementById('iframeWrapper').style.position='fixed';
 
                     let userData = _this.getUserData();
 
@@ -263,7 +264,7 @@ define(
                     });
 
                     //set uuid
-                    // let resultAUTH = '{uuid: "502a308c-b19d-414f-a5e3-15429b41f035", merchantAuth: "CDYFO3q4wTrqgOK/afdVveZ4lQj+9kCRdNHcg9kKM0LcDeFUKC…3o57phFDjmb0TPICoM2Teq2awFJN6BTXEJ6bvot98FDsULQ==", env: "stage2", temporary-order-id: "9980e7e3c6777a6382ffc2041936ce46-71fdcdaef0"}';
+                
                     _this.rkflConfig = {
                         uuid: iframeData.uuid,
                         callback: _this.updateOrder,
@@ -430,4 +431,4 @@ define(
     }
 );
 
-console.log('Shwoer 5');
+console.log('Deploy 7');
