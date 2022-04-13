@@ -40,6 +40,21 @@ define(
                 // var self = this;
                 console.count("I am called", _this.placeOrderClicked);
 
+
+                let rocketStyle = document.createElement('style');
+
+                rocketStyle.innerText = ".loader_rocket {border: 1px solid #000000;border-top: 1px solid #ffffff;border-radius: 50%;width: 20px;height: 20px;animation: spin 0.4s linear infinite;}@keyframes spin {0% {transform: rotate(0deg);}100% {transform: rotate(360deg);}}"
+
+                document.body.appendChild(rocketStyle);
+
+
+                let rotate = document.createElement('div');
+
+                rotate.classList.add('rocket-loader');
+
+                document.getElementById('rocketfuel-place-order').appendChild(rotate);
+
+
                 _this.placeOrderClicked = true;
 
                 if (event) {
@@ -70,7 +85,11 @@ define(
                         _this.placingOrder = false;
 
                         _this.placeOrderClicked = false;
+                        try {
+                            document.getElementById('rocketfuel-place-order').remove();
+                        } catch (error) {
 
+                        }
                     }
 
                     console.log('Response from init', results);
@@ -84,6 +103,12 @@ define(
 
                     _this.placeOrderClicked = false;
                     console.error("There was an error with the place order flow,", error?.message);
+                    try {
+                        document.getElementById('rocketfuel-place-order').remove();
+                    } catch (error) {
+
+                    }
+
 
                 }
 
@@ -246,7 +271,8 @@ define(
                         location.reload();
                         reject();
                     }
-                    document.getElementById('iframeWrapper').style.position='fixed';
+
+                    document.getElementById('iframeWrapper').style.position = 'fixed';
 
                     let userData = _this.getUserData();
 
@@ -264,7 +290,7 @@ define(
                     });
 
                     //set uuid
-                
+
                     _this.rkflConfig = {
                         uuid: iframeData.uuid,
                         callback: _this.updateOrder,
@@ -346,7 +372,6 @@ define(
                         if (engine.isPlaceOrderActionAllowed() === false) return;
                         let res = await engine.initRocketFuel();
 
-                      
                         engine.isPlaceOrderActionAllowed(false);
                         window.addEventListener('message', (event) => {
                             switch (event.data.type) {
@@ -377,7 +402,11 @@ define(
                                                     function () {
                                                         console.log('always')
                                                         engine.isPlaceOrderActionAllowed(true);
+                                                        try {
+                                                            document.getElementById('rocketfuel-place-order').remove();
+                                                        } catch (error) {
 
+                                                        }
                                                     }
                                                 );
 
@@ -387,7 +416,11 @@ define(
                                     } else {
                                         fullScreenLoader.stopLoader();
                                         engine.isPlaceOrderActionAllowed(true);
+                                        try {
+                                            document.getElementById('rocketfuel-place-order').remove();
+                                        } catch (error) {
 
+                                        }
                                         resolve(false);
                                     }
 
