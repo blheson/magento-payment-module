@@ -38,7 +38,7 @@ class Webhook extends \Magento\Config\Block\System\Config\Form\Field
      */
     protected function _getElementHtml(AbstractElement $element)
     {
-        $webhookUrl = $this->store->getBaseUrl() . 'rest/v1/rocketfuel-callback';
+        $webhookUrl = $this->store->getBaseUrl() . 'rest/V1/rocketfuel-callback';
         $value = "You may login to <a target=\"_blank\" href=\"https://app.rocketfuelblockchain.com/settings\">Rocketfuel Merchant Settings</a> to update your Callback URL to:<br><br>"
                 . "<strong style='color:red;'>$webhookUrl</strong>";
         
