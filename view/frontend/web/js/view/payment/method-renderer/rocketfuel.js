@@ -222,19 +222,20 @@ define(
                         'id': item.item_id.toString()
                     }
                 });
-
-
-                if (checkoutConfig.selectedShippingMethod?.amount || (checkoutConfig.totalsData.base_grand_total - productTotal > 0)) {
-                    cart = [...cart, { name: 'Shipping', 'quantity': 1, price: checkoutConfig.selectedShippingMethod?.amount || productTotal, id: new Date().getTime().toString(), }];
+                const quoteTotals = quote.totals();
+                const checkoutTotal = quoteTotals.grand_total;
+                if (quoteTotals.shipping_incl_tax > 0 || (checkoutTotal - productTotal > 0)) {
+                    cart = [...cart, { name: 'Shipping', 'quantity': 1, price: quoteTotals.shipping_incl_tax || quoteTotals.shipping_amount, id: new Date().getTime().toString(), }];
                 }
 
 
                 let fd = new FormData();
+                console.log("quote.totals()", quoteTotals);
+                
+                fd.append("currency", quoteTotals.base_currency_code);
 
-                fd.append("currency", checkoutConfig.totalsData.base_currency_code);
-
-                fd.append("amount", checkoutConfig.totalsData.base_grand_total);
-
+                fd.append("amount", checkoutTotal);
+               
                 fd.append("cart", JSON.stringify(cart));
 
 
@@ -475,4 +476,5 @@ define(
     }
 );
 
-console.log('Deploy 7');
+console.log('Deploy 8');
+// quote.shippingAddress()
