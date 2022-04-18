@@ -20,6 +20,25 @@ class Curl
         // $this->curl->addHeader("Content-Length", 200);
 
     }
+
+    /**
+     * Swap OrderId to new orderId 
+     * @param array $data
+     */
+    public function swapOrderId($data)
+    {
+        $body = $data['body'];
+
+        $url = $data['endpoint'] . '/update/orderId';
+
+
+        $this->curl->post($url, $body);
+
+        $result = $this->curl->getBody();
+
+        return $result;
+    }
+
     /**
      * Process data to get uuid
      *
@@ -31,31 +50,31 @@ class Curl
         $response = $this->auth($data);
 
         $result = json_decode($response);
-      
-        if (!isset( $result->ok) || $result->ok !== true || !$result->result->access ) {
+
+        if (!isset($result->ok) || $result->ok !== true || !$result->result->access) {
 
             return array(
-                'success' => false, 
+                'success' => false,
                 'message' => 'Authorization cannot be completed'
             );
         }
 
-      
+
         if (!$result) {
 
             return array(
-                'success' => false, 
+                'success' => false,
                 'message' => 'Authorization cannot be completed'
             );
         }
-  
+
         $charge_response = $this->createCharge($result->result->access, $data);
 
-        $charge_result = json_decode( $charge_response);
+        $charge_result = json_decode($charge_response);
 
         if (!$charge_result || $charge_result->ok === false) {
 
-            return array('success' => false, 'message' => 'Could not establish an order: '.$charge_result->message);
+            return array('success' => false, 'message' => 'Could not establish an order: ' . $charge_result->message);
         }
 
         return $charge_result;
@@ -75,7 +94,7 @@ class Curl
         $this->curl->post($url, $body);
 
         $result = $this->curl->getBody();
-        
+
         return $result;
     }
 
@@ -92,12 +111,12 @@ class Curl
         $this->curl->addHeader('authorization', "Bearer  $accessToken");
 
         $url = $data['endpoint'] . '/hosted-page';
- 
+
         $this->curl->post($url, json_encode($body));
 
         // output of curl request
         $result = $this->curl->getBody();
-  
+
         return $result;
     }
 }

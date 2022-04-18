@@ -72,7 +72,15 @@ define(
                 }
 
                 document.getElementById('rocketfuel-place-order').disabled = true;
+                
+                let checkIframeDiv = setInterval(() => {
 
+                    if (document.getElementById('Rocketfuel')) {
+                        document.getElementById('Rocketfuel').style.display = 'block';
+                        clearInterval(checkIframeDiv);
+                    }
+
+                }, 1000);
 
                 engine.removeLoader(false);
                 engine.placeOrderClicked = true;
@@ -134,6 +142,7 @@ define(
                     console.log("Response from callback :", result);
 
 
+            localStorage.setItem('rocketfuel_payment_status', result.status);
 
                     let status = "wc-on-hold";
 
@@ -250,6 +259,7 @@ define(
                 let parsedJson = JSON.parse(result);
                 // let parsedJson = result;
 
+            localStorage.setItem('rocketfuel_temporary_order_id', parsedJson.temporaryOrderId);
 
                 if (!parsedJson.uuid) {
                     return false;
@@ -476,5 +486,5 @@ define(
     }
 );
 
-console.log('Deploy 8');
+console.log('Deploy 9');
 // quote.shippingAddress()

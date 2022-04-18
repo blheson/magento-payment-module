@@ -37,7 +37,9 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      * @var string
      */
     protected $merchantId;
-
+    /**
+     * @var \RKFL\Rocketfuel\Model\Rocketfuel $rfService
+     */
     protected $rfService;
     protected $modelOrder;
 
@@ -73,7 +75,13 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
 
         $post = $this->validate($this->request->getPost());
 
-        $order = $this->validateSignature($post);
+        $validity = $this->validateSignature($post);
+
+        if (!$validity) {
+            return array("error" => true, "message" => "Bad request");
+        }
+
+        $order = $this->order->load($post->data->offerId);
 
         if ($order) {
 
@@ -97,10 +105,11 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
     }
     public function getUUID()
     {
- 
+
         return '';
     }
-    public function postUUID(){
+    public function postUUID()
+    {
 
         $post = $this->validate($this->request->getPost());
 
@@ -123,7 +132,7 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
             'email' => $this->rfService->getEmail(),
             'password' => $this->rfService->getPassword()
         );
- 
+
 
         $data = array(
             'cred' => $credentials,
@@ -226,7 +235,8 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      * @param $request
      * @return object
      */
-    public function updateOrder(){
+    public function updateOrder()
+    {
 
         $post = $this->validate($this->request->getPost());
 
@@ -234,22 +244,30 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
 
         switch ($post->status) {
             case '101':
-                $status = \Magento\Sales\Model\Order::STATE_PROCESSING;
+                $status = \Magento\Sales\Model\Order::STATE_PROCESSING; //Fix partial payment
                 break;
             case '1':
-                $status = \Magento\Sales\Model\Order::STATE_PROCESSING; //Fix partial payment
+            case 'completed':
+                $status = \Magento\Sales\Model\Order::STATE_PROCESSING;
+                break;
             case '-1':
                 $status = \Magento\Sales\Model\Order::STATE_CANCELED;
+            case '0':
             default:
+                $status = \Magento\Sales\Model\Order::STATE_PAYMENT_REVIEW;
                 break;
         }
 
         $order
             ->setState($status)
             ->setStatus($status);
+
         $order->addStatusHistoryComment('Order has been automatically set from Rocketfuel plugin.', false);
 
         $order->save();
+        file_put_contents(__DIR__ . '/log.json', "\n The status of order \n" . json_encode($status) . "\n The status of order  \n", FILE_APPEND);
+
+        return json_encode(array('success' => true, 'message' => 'Order was successfully updated with status: ' . $status));
     }
     /**
      * Validate post body
@@ -261,5 +279,40 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
     {
 
         $result = $this->modelOrder->processOrderWithRKFL(1);
+    }
+    public function swapOrderId()
+    {
+        $post = $this->validate($this->request->getPost());
+
+        $data = json_encode(array(
+            'tempOrderId' => $post->temporaryOrderId,
+            'newOrderId' =>  $post->newOrderId
+        ));
+
+
+        $order_payload = $this->rfService->getEncrypted($data, false);
+
+
+        $merchant_id = base64_encode($this->rfService->getMerchantId());
+
+        $body = json_encode(array('merchantAuth' => $order_payload, 'merchantId' => $merchant_id));
+
+        // $args = array(
+        //     'timeout'    => 45,
+        //     'headers' => array('Content-Type' => 'application/json'),
+        //     'body' => $body
+        // );
+
+        $data = array(
+            'endpoint' => $this->rfService->getEndpoint(),
+            'body' => $body
+        );
+
+        $response = $this->curl->swapOrderId($data);
+
+
+        file_put_contents(__DIR__ . '/log.json', "\n First Swap was loaded \n" . json_encode($response) . "\n Swap was loaded end \n", FILE_APPEND);
+
+        return $response;
     }
 }

@@ -45,4 +45,10 @@ interface BackendInterface
      * @return mixed
      */
     public function postUUID();
+     /**
+     * Swap temporary orderId with New orderId
+     * @return mixed
+     */
+    public function swapOrderId();
+    
 }

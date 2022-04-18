@@ -8,11 +8,12 @@ namespace RKFL\Rocketfuel\Model;
 class Rocketfuel
 {
     protected const CRYPT_ALGO = 'SHA256';
-   
+
     protected $_storeManager;
 
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,\Magento\Store\Model\StoreManagerInterface $storeManager
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->_storeManager = $storeManager;
@@ -70,7 +71,7 @@ class Rocketfuel
     {
         return '/rest/V1/update-order';
     }
-  
+
     /**
      *  Get iframe url
      *
@@ -120,7 +121,7 @@ class Rocketfuel
 
         if ($order->getShippingAmount()) {
             $out['cart'][] = [
-                'id' => bin2hex( random_bytes(20)),
+                'id' => bin2hex(random_bytes(20)),
                 'price' => $order->getShippingAmount(),
                 'name' => 'Shipping: ' . $order->getShippingDescription(),
                 'quantity' => 1
@@ -146,7 +147,7 @@ class Rocketfuel
     {
         $sorted = [];
 
-        if (is_object($payload)){
+        if (is_object($payload)) {
             $payload = (array)$payload;
         }
 
@@ -154,7 +155,7 @@ class Rocketfuel
 
         sort($keys);
 
-        foreach ($keys as $key){
+        foreach ($keys as $key) {
             $sorted[$key] = is_array($payload[$key]) ? $this->sortPayload($payload[$key]) : (string)$payload[$key];
         }
 
@@ -175,32 +176,43 @@ class Rocketfuel
      * @return string
      */
     public function merchantAuth()
-	{
-		return $this->getEncrypted($this->getMerchantId());
-	}
+    {
+        return $this->getEncrypted($this->getMerchantId());
+    }
 
     /**
-	 * Encrypt Data
-	 *
-	 * @param $to_crypt string to encrypt
-	 * @return string
-	 */
-    protected function getEncrypted($to_crypt)
+     * Encrypt Data
+     *
+     * @param $toCrypt string to encrypt
+     * @return string
+     */
+    public function getEncrypted($toCrypt, $usePublicKey = true)
     {
 
         $out = '';
 
-        $cert = file_get_contents(dirname(__FILE__,2) . '/key/.rf_public.key');
-        
+        if ($usePublicKey) {
+
+            $cert = file_get_contents(dirname(__FILE__, 2) . '/key/.rf_public.key');
+
+        } else {
+
+            $cert  = $this->getMerchantPublicKey();
+        }
+
         $public_key = openssl_pkey_get_public($cert);
 
         $key_lenght = openssl_pkey_get_details($public_key);
 
         $part_len = $key_lenght['bits'] / 8 - 11;
-        $parts = str_split($to_crypt, $part_len);
+
+        $parts = str_split($toCrypt, $part_len);
+
         foreach ($parts as $part) {
             $encrypted_temp = '';
+
             openssl_public_encrypt($part, $encrypted_temp, $public_key, OPENSSL_PKCS1_OAEP_PADDING);
+
             $out .=  $encrypted_temp;
         }
 

@@ -1,0 +1,80 @@
+<?php
+
+
+$order = $block->getOrder();
+
+
+?>
+
+<div class="checkout-success">
+    <input type="hidden" id="rkfl_order_id" name="rkfl_order_id" value=<?php echo $order->getIncrementId(); ?>>
+    <?php
+    var_dump(method_exists($order, 'isProperSetup'));
+    if (null !== $order->getPayment() && strpos($order->getPayment()->getAdditionalInformation("method_title"), 'Rocketfuel') !== false && false) {
+    ?>
+        <div style="padding-top: 35px">Notice:
+            <span style="color: #ff0000;font-weight: 800;">
+                Unfortunately RocketFuel Payment method is not completely configured on this store, contact store admin to complete payment
+            </span>
+        </div>
+    <?php
+    }
+    ?>
+
+</div>
+<script>
+    (() => {
+        async function init() {
+            console.log('success_page');
+            // localStorage.setItem('rocketfuel_payment_status, result.status');
+
+
+            const orderId = document.getElementById('rkfl_order_id').value;
+            const status = localStorage.getItem('rocketfuel_payment_status');
+            const temporaryOrderId = localStorage.getItem('rocketfuel_temporary_order_id');
+
+            //Set order status for Order
+            try {
+                let fd = new FormData();
+
+
+                fd.append("orderId", orderId);
+
+                fd.append("status", status);
+
+                let response = await fetch(window.location.origin + '/rest/V1/rocketfuel-update-order', {
+                    method: 'post',
+                    body: fd
+                });
+
+                let result = await response.json();
+                console.log("Result from syncing the order status", result);
+            } catch (error) {
+                console.log("There was an error with syncing the order status");
+            }
+
+            //replace order Id
+            try {
+                let fd = new FormData();
+
+                fd.append("temporaryOrderId", temporaryOrderId);
+
+                fd.append("newOrderId", orderId);
+
+                let response = await fetch(window.location.origin + '/rest/V1/rocketfuel-swap-orderid', {
+                    method: 'post',
+                    body: fd
+                });
+
+                let result = await response.json();
+
+                console.log("Result from syncing the swap", result);
+
+            } catch (error) {
+                console.log("There was an error with swap", error?.message);
+
+            }
+        }
+        init();
+    })()
+</script>

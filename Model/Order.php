@@ -91,6 +91,7 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
     {
 
         return $this->rfService->getEnvironment();
+        
     }
     /**
      * Return payment method title for specific order Id
@@ -120,6 +121,9 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
             )
         );
     }
+    public function isProperSetup(){
+        return !!$this->rfService->getPassword();
+    }
 
     public function getMerchantPublicKey()
     {
@@ -129,12 +133,9 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
     public function processOrderWithRKFL($orderId = 1)
     {
 
-
         $order =   $this->_orderFactory->create()->loadByIncrementId($orderId);
 
-
         $payload  = $this->getRocketfuelPayload($order);
-
        
         if (!$this->rfService->getEmail() || !$this->rfService->getPassword()) {
             return array('error' => 'true', 'message' => 'Payment gateway not completely configured');
@@ -182,7 +183,7 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
     {
         $result = $this->processOrderWithRKFL(1);
     }
-        /**
+     /**
      * Validate post body
      *
      * @param int $orderId
