@@ -5,7 +5,7 @@ namespace RKFL\Rocketfuel\Model;
 use RKFL\Rocketfuel\Model\Rocketfuel;
 use RKFL\Rocketfuel\Model\Curl;
 use RKFL\Rocketfuel\Api\OrderInterface;
-
+use Magento\Store\Model\Store as Store;
 
 class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
 {
@@ -32,6 +32,7 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
         \Magento\Framework\Registry $registry,
         Rocketfuel $rocketfuel,
         Curl $curl,
+        Store $store,
         array $data = []
     ) {
         parent::__construct($context, $registry, $data);
@@ -40,22 +41,26 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
         $this->_orderFactory = $orderFactory;
         $this->rfService = $rocketfuel;
         $this->curl = $curl;
+        $this->store = $store;
     }
 
     /**
-     * get order entity
+     *Get order entity
      *
      * @return mixed
      */
     public function getOrder()
     {
-        return $this->_order = $this->_orderFactory->create()->loadByIncrementId(
+        // $this->_order = $this->checkoutSession->getLastRealOrder();
+        $this->_order = $this->_orderFactory->create()->loadByIncrementId(
             $this->checkoutSession->getLastRealOrderId()
         );
+
+        return $this->_order;
     }
 
-    public function getPaymentProcessDetails(){
-
+    public function getPaymentProcessDetails()
+    {
     }
 
     /**
@@ -82,10 +87,11 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
      *
      * @return string
      */
-    public function getEnvironment() {
-        
-        return $this->rfService->getEnvironment();
+    public function getEnvironment()
+    {
 
+        return $this->rfService->getEnvironment();
+        
     }
     /**
      * Return payment method title for specific order Id
@@ -93,11 +99,6 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
     public function getPaymentCode()
     {
         return 'RocketFuel';
-        //$order = $this->getOrder();
-        //$payment = $order->getPayment();
-        //$method = $payment->getMethodInstance();
-        //echo $method->getTitle();
-        //return $method->getCode();
     }
 
     /**
@@ -111,27 +112,40 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
     }
 
 
-    public function getRocketfuelPayload($order){
+    public function getRocketfuelPayload($order)
+    {
 
         return json_encode(
             $this->rfService->getOrderPayload(
                 $order
             )
         );
-
     }
-    public function processOrderWithRKFL( $orderId = 1 ){
-    
+    public function isProperSetup(){
+        return !!$this->rfService->getPassword();
+    }
+
+    public function getMerchantPublicKey()
+    {
+        return $this->rfService->getMerchantPublicKey();
+    }
+
+    public function processOrderWithRKFL($orderId = 1)
+    {
 
         $order =   $this->_orderFactory->create()->loadByIncrementId($orderId);
 
         $payload  = $this->getRocketfuelPayload($order);
+       
+        if (!$this->rfService->getEmail() || !$this->rfService->getPassword()) {
+            return array('error' => 'true', 'message' => 'Payment gateway not completely configured');
+        }
 
         $credentials = array(
             'email' => $this->rfService->getEmail(),
             'password' => $this->rfService->getPassword()
         );
-       
+
         $data = array(
             'cred' => $credentials,
             'endpoint' => $this->rfService->getEndpoint(),
@@ -141,16 +155,12 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
         $response = $this->curl->processPayment($data);
 
 
-       $processResult = json_decode( $response );
+        $processResult = json_decode($response);
 
-       if(  !$processResult ){
-        echo json_encode(array('success' => 'false','message'=>'There was an error in the process '  ));
+        if (!$processResult) {
 
-        return false;
-
-        exit();
-       }
-
+            return array('error' => 'true', 'message' => 'There was an error in the process');
+        }
 
         $userData = json_encode(array(
             'first_name' => $order->getBillingAddress()->getFirstName(),
@@ -158,17 +168,12 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
             'email' => $order->getBillingAddress()->getEmail(),
             'merchant_auth' => $this->rfService->merchantAuth()
         ));
-        
 
-        
-        
-        $resultData = array('uuid'=>$processResult->result->uuid, 'userData'=>$userData,'env'=> $this->rfService->getEnvironment() );
-
-
+        $resultData = array('uuid' => $processResult->result->uuid, 'userData' => $userData, 'env' => $this->rfService->getEnvironment());
 
         return $resultData;
     }
-      /**
+    /**
      * Validate post body
      *
      * @param int $orderId
@@ -176,10 +181,24 @@ class Order extends \Magento\Sales\Block\Order\Totals implements OrderInterface
      */
     public function getAuth()
     {
-  
-
         $result = $this->processOrderWithRKFL(1);
-      
-        echo json_encode(array('p_key' =>     $result ));
+    }
+     /**
+     * Validate post body
+     *
+     * @param int $orderId
+     * @return object
+     */
+    public function getUuid()
+    {
+        return ['let'=>'ssd'];
+    }
+    /**
+     * Get store url
+     * @return string
+     */
+    public function getBaseUrl()
+    {
+        return $this->store->getBaseUrl();
     }
 }

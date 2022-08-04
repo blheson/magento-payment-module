@@ -37,7 +37,9 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      * @var string
      */
     protected $merchantId;
-
+    /**
+     * @var \RKFL\Rocketfuel\Model\Rocketfuel $rfService
+     */
     protected $rfService;
     protected $modelOrder;
 
@@ -63,9 +65,8 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
         $this->modelOrder = $modelOrder;
     }
 
-
     /**
-     * api callback endpoint
+     * Api callback endpoint
      *
      * @return mixed
      */
@@ -74,7 +75,13 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
 
         $post = $this->validate($this->request->getPost());
 
-        $order = $this->validateSignature($post);
+        $validity = $this->validateSignature($post);
+
+        if (!$validity) {
+            return array("error" => true, "message" => "Bad request");
+        }
+
+        $order = $this->order->load($post->data->offerId);
 
         if ($order) {
 
@@ -85,20 +92,71 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
             $order->save();
 
             //Todo response
-            echo json_encode([
+            return json_encode([
                 'status' => 'ok'
             ]);
-
         } else {
 
-            echo json_encode([
+            return json_encode([
                 'status' => 'error',
                 'signature not valid'
             ]);
-
         }
     }
+    public function getUUID()
+    {
 
+        return '';
+    }
+    public function postUUID()
+    {
+
+        $post = $this->validate($this->request->getPost());
+
+        file_put_contents(__DIR__ . '/log.json', "\n" . "Thepost : " . json_encode($post), FILE_APPEND);
+
+        if (!$this->rfService->getEmail() || !$this->rfService->getPassword()) {
+            return array('error' => true, 'message' => 'Payment gateway not completely configured');
+        }
+        if (!$post->amount || !$post->currency || !$post->cart) {
+            return array('error' => true, 'message' => 'Payment gateway not completely configured');
+        }
+        $payload = array(
+            'cart' => json_decode($post->cart),
+            'amount' => $post->amount,
+            'currency' => $post->currency,
+            'merchant_id' => $this->rfService->getMerchantId(),
+            'order' => md5(microtime()) . '-' . bin2hex(random_bytes(5))
+        );
+        $credentials = array(
+            'email' => $this->rfService->getEmail(),
+            'password' => $this->rfService->getPassword()
+        );
+
+
+        $data = array(
+            'cred' => $credentials,
+            'endpoint' => $this->rfService->getEndpoint(),
+            'body' => $payload
+        );
+
+        $response = $this->curl->processPayment($data);
+
+
+        $processResult = $response;
+
+        file_put_contents(__DIR__ . '/log.json', "\n" . "The result : " . json_encode($processResult), FILE_APPEND);
+        if (!$processResult) {
+
+            return array('error' => 'true', 'message' => 'There was an error in the process');
+        }
+
+
+        $resultData = array('uuid' => $processResult->result->uuid, 'merchantAuth' => $this->rfService->merchantAuth(), 'env' => $this->rfService->getEnvironment(), 'temporaryOrderId' => $payload['order']);
+
+        file_put_contents(__DIR__ . '/log.json', "\n" . "The endpoint spew : " . json_encode($resultData), FILE_APPEND);
+        return json_encode($resultData);
+    }
     /**
      *  Get callback function
      *  for check exists callback url
@@ -131,10 +189,10 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      * @param $request
      * @return object
      */
-    protected function validate($request)
+    protected function validate($request, $type = 'post')
     {
         foreach ($this->request_keys as $key) {
-            if (!array_key_exists($key, $request)) {
+            if ($type === 'post' ? !property_exists($request, $key) : !array_key_exists($key, $request)) {
                 //todo throw exception
             };
         }
@@ -145,7 +203,8 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      * @param $request
      * @return int
      */
-    protected function validateSignature($request){
+    protected function validateSignature($request)
+    {
 
         $public_key = openssl_pkey_get_public(
             file_get_contents(dirname(__FILE__) . '/../key/.rf_public.key')
@@ -160,12 +219,12 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
             json_encode($this->rfService->getOrderPayload($order)),
             base64_decode($request->signature),
             $public_key,
-            'SHA256')
-        ) {
+            'SHA256'
+        )) {
             return $order;
         } else {
             //todo throw exception
-            print_r('error');
+            // print_r('error');
             return false;
         }
     }
@@ -176,7 +235,8 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      * @param $request
      * @return object
      */
-    public function updateOrder(){
+    public function updateOrder()
+    {
 
         $post = $this->validate($this->request->getPost());
 
@@ -184,25 +244,30 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
 
         switch ($post->status) {
             case '101':
+                $status = \Magento\Sales\Model\Order::STATE_PROCESSING; //Fix partial payment
+                break;
+            case '1':
+            case 'completed':
                 $status = \Magento\Sales\Model\Order::STATE_PROCESSING;
                 break;
             case '-1':
                 $status = \Magento\Sales\Model\Order::STATE_CANCELED;
-                break;
-            case '1':
-                $status = \Magento\Sales\Model\Order::STATE_PROCESSING; //Fix partial payment
+            case '0':
             default:
+                $status = \Magento\Sales\Model\Order::STATE_PAYMENT_REVIEW;
                 break;
         }
 
         $order
             ->setState($status)
             ->setStatus($status);
+
         $order->addStatusHistoryComment('Order has been automatically set from Rocketfuel plugin.', false);
 
         $order->save();
+        file_put_contents(__DIR__ . '/log.json', "\n The status of order \n" . json_encode($status) . "\n The status of order  \n", FILE_APPEND);
 
-        echo json_encode(array('trea' =>   $post));
+        return json_encode(array('success' => true, 'message' => 'Order was successfully updated with status: ' . $status));
     }
     /**
      * Validate post body
@@ -210,10 +275,44 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      * @param int $orderId
      * @return object
      */
-    public function getAuth(){
+    public function getAuth()
+    {
 
         $result = $this->modelOrder->processOrderWithRKFL(1);
+    }
+    public function swapOrderId()
+    {
+        $post = $this->validate($this->request->getPost());
 
-        echo json_encode(array('trea' =>   $result));
+        $data = json_encode(array(
+            'tempOrderId' => $post->temporaryOrderId,
+            'newOrderId' =>  $post->newOrderId
+        ));
+
+
+        $order_payload = $this->rfService->getEncrypted($data, false);
+
+
+        $merchant_id = base64_encode($this->rfService->getMerchantId());
+
+        $body = json_encode(array('merchantAuth' => $order_payload, 'merchantId' => $merchant_id));
+
+        // $args = array(
+        //     'timeout'    => 45,
+        //     'headers' => array('Content-Type' => 'application/json'),
+        //     'body' => $body
+        // );
+
+        $data = array(
+            'endpoint' => $this->rfService->getEndpoint(),
+            'body' => $body
+        );
+
+        $response = $this->curl->swapOrderId($data);
+
+
+        file_put_contents(__DIR__ . '/log.json', "\n First Swap was loaded \n" . json_encode($response) . "\n Swap was loaded end \n", FILE_APPEND);
+
+        return $response;
     }
 }

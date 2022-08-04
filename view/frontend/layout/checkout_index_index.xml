@@ -9,6 +9,11 @@
         <!-- <link src="RKFL_Rocketfuel::js/rkfl.js"/> -->
     </head>
     <body>
+     <referenceBlock name="require.js">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">RKFL_Rocketfuel::page/js/require_js.phtml</argument>
+            </action>
+        </referenceBlock> 
         <referenceBlock name="checkout.root">
             <arguments>
                 <argument name="jsLayout" xsi:type="array">
@@ -29,7 +34,7 @@
                                                                     <item name="component" xsi:type="string">RKFL_Rocketfuel/js/view/payment/method-renderer</item>
                                                                     <item name="methods" xsi:type="array">
                                                                         <item name="rocketfuel" xsi:type="array">
-                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">false</item>
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
                                                                         </item>
                                                                     </item>
                                                                 </item>

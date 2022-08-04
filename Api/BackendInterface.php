@@ -11,7 +11,7 @@ interface BackendInterface
     public function postCallback();
 
     /**
-     * get order payload for rocketfuel extension
+     * Get order payload for rocketfuel extension
      *
      * @param $id
      * @return array|false|string
@@ -35,5 +35,20 @@ interface BackendInterface
      * @return mixed
      */
     public function getAuth();
+    /**
+     * callback for get UUID
+     * @return mixed
+     */
+    public function getUUID();
+    /**
+     * callback for post UUID
+     * @return mixed
+     */
+    public function postUUID();
+     /**
+     * Swap temporary orderId with New orderId
+     * @return mixed
+     */
+    public function swapOrderId();
     
 }

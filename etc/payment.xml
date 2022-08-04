@@ -15,9 +15,14 @@ GNU General Public License for more details.
 -->
 
 <payment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
-    <groups>
+    <!-- <groups>
         <group id="rocketfuel">
             <label>Rocketfuel</label>
+        </group>
+    </groups> -->
+    <groups>
+        <group id="offline">
+            <label>Offline Payment Methods</label>
         </group>
     </groups>
     <methods>

@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
 
@@ -8,26 +9,46 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+   
     <route method="GET" url="/V1/rocketfuel-callback">
         <service class="RKFL\Rocketfuel\Api\BackendInterface" method="getCallback"/>
         <resources>
-            <resource ref="anonymous"/>
+            <resource ref="anonymous" />
         </resources>
     </route>
+   
     <route method="POST" url="/V1/rocketfuel-update-order">
         <service class="RKFL\Rocketfuel\Api\BackendInterface" method="updateOrder"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>
     </route>
-
     <route method="GET" url="/V1/rocketfuel-get-payload/:id">
         <service class="RKFL\Rocketfuel\Api\BackendInterface" method="getRocketfuelPayload"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>
     </route>
-        <route method="GET" url="/V1/rocketfuel-get-iframe-data">
+    <route method="GET" url="/V1/rocketfuel-get-uuid">
+        <service class="RKFL\Rocketfuel\Api\BackendInterface" method="getUUID"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+   <route method="POST" url="/V1/rocketfuel-post-uuid">
+        <service class="RKFL\Rocketfuel\Api\BackendInterface" method="postUUID"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route method="POST" url="/V1/rocketfuel-swap-orderid">
+        <service class="RKFL\Rocketfuel\Api\BackendInterface" method="swapOrderId"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+  
+    <route method="GET" url="/V1/rocketfuel-get-iframe-data">
         <service class="RKFL\Rocketfuel\Api\OrderInterface" method="getAuth"/>
         <resources>
             <resource ref="anonymous"/>
