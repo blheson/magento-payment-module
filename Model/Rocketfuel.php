@@ -57,7 +57,7 @@ class Rocketfuel
 
         $environmentData = array(
             'prod' => 'https://app.rocketfuelblockchain.com/api',
-            'dev' => 'https://dev-app.rocketdemo.net/api',
+            'sandbox' => 'https://app-sandbox.rocketfuelblockchain.com/api',
             'stage2' => 'https://qa-app.rocketdemo.net/api',
             'preprod' => 'https://preprod-app.rocketdemo.net/api',
         );

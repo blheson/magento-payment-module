@@ -8,7 +8,8 @@ class UrlList implements \Magento\Framework\Option\ArrayInterface
         'https://iframe-stage1.rocketdemo.net',
         'https://iframe.rocketdemo.net',
         'https://iframe-stage2.rocketdemo.net',
-        'https://iframe.rocketfuelblockchain.com'
+        'https://iframe.rocketfuelblockchain.com',
+        'https://iframe-sandbox.rocketfuelblockchain.com',
     ];
     /**
      * {@inheritdoc}
@@ -33,6 +34,7 @@ class UrlList implements \Magento\Framework\Option\ArrayInterface
         return array(
             'prod'=>'Production',
             'stage2'=>'QA',
+            'sandbox'=>'Sandbox',
             'dev'=>'Development',
         );
     }

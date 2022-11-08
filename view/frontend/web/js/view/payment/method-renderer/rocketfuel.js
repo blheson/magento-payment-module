@@ -24,6 +24,7 @@ define(
             defaults: {
                 template: 'RKFL_Rocketfuel/payment/rocketfuel'
             },
+            updateOrderCalled: false,
             redirectAfterPlaceOrder: true,
             theObject: function () {
                 return this;
@@ -144,6 +145,9 @@ define(
 
             localStorage.setItem('rocketfuel_payment_status', result.status);
 
+                    if (self.updateOrderCalled === true) {
+                        return
+                    }
                     let status = "wc-on-hold";
 
                     if (result?.status === undefined) {
@@ -168,7 +172,8 @@ define(
                         status = "wc-failed";
                     }
 
-
+                    window.postMessage({ type: 'rocketfuel_place_order_action', message: true });
+                    self.updateOrderCalled = true
                 } catch (error) {
 
                     console.error('Error from update order method', error);
@@ -246,7 +251,6 @@ define(
                 fd.append("amount", checkoutTotal);
                
                 fd.append("cart", JSON.stringify(cart));
-
 
 
                 let response = await fetch(window.location.origin + '/rest/V1/rocketfuel-post-uuid', {
@@ -486,5 +490,4 @@ define(
     }
 );
 
-console.log('Deploy 9');
-// quote.shippingAddress()
+console.log('v3.0.3');
