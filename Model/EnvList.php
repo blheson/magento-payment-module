@@ -16,7 +16,7 @@ class EnvList implements \Magento\Framework\Option\ArrayInterface
         return array(
             'prod'=>'Production',
             'stage2'=>'QA',
-            'dev'=>'Development',
+            'sandbox'=>'Sandbox',
             'preprod'=>'Pre-Production',
         );
     }

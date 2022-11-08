@@ -70,12 +70,31 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      */
     public function postCallback()
     {
+        $body = json_decode($this->request->getContent());
+if(!$body){
+    
+    return json_encode([
+        'status' => 'error',
+        'message'=>'Invalid request format'
+    ]);
+}
+        $post = $this->validate( $body );
 
-        $post = $this->validate($this->request->getPost());
-
+        if (!isset($post->data)) {
+            return json_encode([
+                'status' => 'error',
+                'message' => 'invalid format'
+            ]);
+        }
+if($post->data->paymentStatus == 0 || $post->data->paymentStatus == -1){
+    return json_encode([
+        'status' => 'error',
+        'message' => 'unconfirmed status'
+    ]);
+}
         $order = $this->validateSignature($post);
 
-        if ($order) {
+   if ($order) {
 
             $order
                 ->setState(\Magento\Sales\Model\Order::STATE_COMPLETE)
@@ -98,7 +117,7 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
     public function getUUID()
     {
         $post = $this->validate($this->request->getParams(), 'get');
-        var_dump($post);
+ 
         if (!$this->rfService->getEmail() || !$this->rfService->getPassword()) {
             return array('error' => 'true', 'message' => 'Payment gateway not completely configured');
         }
@@ -135,9 +154,14 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
 
         return $resultData;
     }
-    public function postUUID(){
+    public function postUUID()
+    {
 
         $post = $this->validate($this->request->getPost());
+        if(!$post){
+            return json_encode(array('error' => true, 'message' => 'Invalid Request'));
+
+        }
 
         file_put_contents(__DIR__ . '/log.json', "\n" . "Thepost : " . json_encode($post), FILE_APPEND);
 
@@ -158,7 +182,7 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
             'email' => $this->rfService->getEmail(),
             'password' => $this->rfService->getPassword()
         );
- 
+
 
         $data = array(
             'cred' => $credentials,
@@ -218,8 +242,11 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
     protected function validate($request, $type = 'post')
     {
         foreach ($this->request_keys as $key) {
+        
             if ($type === 'post' ? !property_exists($request, $key) : !array_key_exists($key, $request)) {
                 //todo throw exception
+  
+                return false;
             };
         }
         return (object)$request;
@@ -235,14 +262,16 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
         $public_key = openssl_pkey_get_public(
             file_get_contents(dirname(__FILE__) . '/../key/.rf_public.key')
         );
-        $data = json_decode($request->data);
-
+        $data = $request->data;
+if(!isset(json_decode($data->data)->offerId)){
+    return false;
+}
         $order = $this->order->load($data->offerId);
-        //todo for testing
-        //return $order;
-
+        // $order = $this->order->load(json_decode($data->data)->offerId);
+  
+        // json_encode($this->rfService->getOrderPayload($order)),
         if (openssl_verify(
-            json_encode($this->rfService->getOrderPayload($order)),
+            $data->data,
             base64_decode($request->signature),
             $public_key,
             'SHA256'
@@ -261,10 +290,13 @@ class Backend extends \Magento\Framework\Model\AbstractModel implements BackendI
      * @param $request
      * @return object
      */
-    public function updateOrder(){
+    public function updateOrder()
+    {
 
         $post = $this->validate($this->request->getPost());
-
+if(!$post){
+    return false;
+}
         $order = $this->order->load($post->orderId);
 
         switch ($post->status) {

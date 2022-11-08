@@ -24,6 +24,7 @@ define(
             defaults: {
                 template: 'RKFL_Rocketfuel/payment/rocketfuel'
             },
+            updateOrderCalled: false,
             redirectAfterPlaceOrder: true,
             isActive: function () {
                 return true;
@@ -33,6 +34,7 @@ define(
 
                 var checkoutConfig = window.checkoutConfig;
                 var paymentData = quote.billingAddress();
+
 
 
                 // var paystackConfiguration = checkoutConfig.payment.pstk_paystack;
@@ -47,13 +49,13 @@ define(
                     paymentData.email = quote.guestEmail;
                 }
 
-                console.log(paymentData);
+
                 //     var quoteId = checkoutConfig.quoteItemData[0].quote_id;
 
                 var _this = this;
                 _this.isPlaceOrderActionAllowed(false);
                 let results = await _this.init();
-                console.log('init', results);
+
             },
             /**
                 * Provide redirect to page
@@ -72,10 +74,11 @@ define(
             updateOrder: function (result) {
                 try {
 
-                    console.log("Response from callback :", result);
+                    console.log("Response from callback :", { result }, self.updateOrderCalled);
 
-                    console.log("order_id :", this.order_id);
-
+                    if (self.updateOrderCalled === true) {
+                        return
+                    }
                     let status = "wc-on-hold";
 
                     if (result?.status === undefined) {
@@ -99,8 +102,9 @@ define(
                         status = "wc-failed";
                     }
                     fullScreenLoader.stopLoader();
-                    window.postMessage({ type: 'rocketfuel_place_order_action', message: true });
 
+                    window.postMessage({ type: 'rocketfuel_place_order_action', message: true });
+                    self.updateOrderCalled = true
                 } catch (error) {
 
                     console.error('Error from update order method', error);
@@ -120,7 +124,7 @@ define(
                     switch (event.data.type) {
                         case 'rocketfuel_place_order_action':
 
-                            console.log('rocketfuel_place_order_action has been called', additionalValidators.validate());
+                            console.log('rocketfuel_ place_order_action has been called', additionalValidators.validate());
                             fullScreenLoader.startLoader();
 
                             if (event) {
@@ -145,13 +149,7 @@ define(
                                     .done(
                                         function () {
 
-                                            // fullScreenLoader.stopLoader();
-                                            // self.afterPlaceOrder();
-                                            console.log('redirect has been raised');
-
-                                            // if (self.redirectAfterPlaceOrder) {
-                                            console.log('redirect', redirectOnSuccessAction.execute());
-                                            // }
+                                            redirectOnSuccessAction.execute()
                                         }
                                     ).always(
                                         function () {
@@ -201,7 +199,6 @@ define(
                         'id': item.item_id.toString()
                     }
                 });
-                console.log('shi card', checkoutConfig.selectedShippingMethod?.amount)
 
                 if (checkoutConfig.selectedShippingMethod?.amount) {
                     cart = [...cart, { name: 'Shipping', 'quantity': 1, price: checkoutConfig.selectedShippingMethod.amount, id: new Date().getTime().toString(), }];
@@ -215,7 +212,6 @@ define(
                 fd.append("amount", checkoutConfig.totalsData.base_grand_total);
                 fd.append("cart", JSON.stringify(cart));
 
-                console.log("The cart is :", JSON.stringify(cart));
 
                 let response = await fetch(window.location.origin + '/rest/V1/rocketfuel-post-uuid', {
                     method: 'post',
@@ -229,7 +225,7 @@ define(
 
                 let parsedJson = JSON.parse(result);
                 // let parsedJson = result;
-                console.log('the response', parsedJson);
+
                 if (!parsedJson.uuid) {
                     return false;
                 }
@@ -256,7 +252,6 @@ define(
                 //     this.redirectToCustomAction(paystackConfiguration.integration_type_standard_url);
                 // } else {
 
-                console.log('paymentData', paymentData);
 
                 let user_data;
 
@@ -299,7 +294,6 @@ define(
 
                     let userData = _this.getUserData();
 
-                    console.log('user data', userData);
 
                     let payload, response, rkflToken;
 
@@ -335,7 +329,7 @@ define(
                         }
 
                         try {
-                            console.log('details', userData.email, localStorage.getItem('rkfl_email'), payload);
+
 
                             if (userData.email !== localStorage.getItem('rkfl_email')) { //remove signon details when email is different
                                 localStorage.removeItem('rkfl_token');
@@ -375,7 +369,7 @@ define(
                     }
 
                     if (_this.rkflConfig) {
-                        console.log('data', _this.rkflConfig);
+
                         _this.rkfl = new RocketFuel(_this.rkflConfig); // init RKFL
 
                         resolve(true);
@@ -428,4 +422,4 @@ define(
     }
 );
 
-console.log('shooon');
+console.log('v3.0.3');
