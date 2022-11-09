@@ -153,7 +153,7 @@ define(
                     if (result?.status === undefined) {
                         return false;
                     }
-                    fullScreenLoader.stopLoader();
+                    // fullScreenLoader.stopLoader();
 
                     let result_status = parseInt(result.status);
 
@@ -244,8 +244,7 @@ define(
 
 
                 let fd = new FormData();
-                console.log("quote.totals()", quoteTotals);
-                
+            
                 fd.append("currency", quoteTotals.base_currency_code);
 
                 fd.append("amount", checkoutTotal);
@@ -312,7 +311,10 @@ define(
                     let iframeData = await this.iframeData();
 
                     if (!iframeData.env || !iframeData.uuid) {
-                        console.log('Iframe data is not complete', iframeData);
+                        console.log('Iframe data is not completes', iframeData);
+                        fullScreenLoader.stopLoader();
+                        engine.isPlaceOrderActionAllowed(true);
+                        engine.removeLoader(true)
                         return;
                     }
                     engine.rkfl = new RocketFuel({
@@ -411,7 +413,7 @@ define(
                                     if (engine.placingOrder === true) return;
                                     if (event.data.paymentCompleted === 1) {
 
-                                        console.log('This is closed and also validating');
+                                      
                                         engine.placingOrder = true;
                                         // engine.isPlaceOrderActionAllowed(false);
 
@@ -430,7 +432,7 @@ define(
                                                     }
                                                 ).always(
                                                     function () {
-                                                        console.log('always')
+                                                
                                                         engine.isPlaceOrderActionAllowed(true);
                                                         engine.removeLoader(true)
                                                     }

@@ -125,12 +125,14 @@ if($post->data->paymentStatus == 0 || $post->data->paymentStatus == -1){
     {
 
         $post = $this->validate($this->request->getPost());
+ 
+
         if(!$post){
             return json_encode(array('error' => true, 'message' => 'Invalid Request'));
 
         }
 
-        file_put_contents(__DIR__ . '/log.json', "\n" . "Thepost : " . json_encode($post), FILE_APPEND);
+        file_put_contents(__DIR__ . '/log.json', "\n [".date('d m Y H:i:s'). "] Thepost : " . json_encode($post), FILE_APPEND);
 
         if (!$this->rfService->getEmail() || !$this->rfService->getPassword()) {
             return array('error' => true, 'message' => 'Payment gateway not completely configured');
@@ -171,7 +173,7 @@ if($post->data->paymentStatus == 0 || $post->data->paymentStatus == -1){
 
         $resultData = array('uuid' => $processResult->result->uuid, 'merchantAuth' => $this->rfService->merchantAuth(), 'env' => $this->rfService->getEnvironment(), 'temporaryOrderId' => $payload['order']);
 
-        file_put_contents(__DIR__ . '/log.json', "\n" . "The endpoint spew : " . json_encode($resultData), FILE_APPEND);
+        file_put_contents(__DIR__ . '/log.json', "\n [" .date('d m Y H:i:s'). "] The endpoint spew : " . json_encode($resultData), FILE_APPEND);
         return json_encode($resultData);
     }
     /**
@@ -208,14 +210,13 @@ if($post->data->paymentStatus == 0 || $post->data->paymentStatus == -1){
      */
     protected function validate($request, $type = 'post')
     {
-        foreach ($this->request_keys as $key) {
-        
-            if ($type === 'post' ? !property_exists($request, $key) : !array_key_exists($key, $request)) {
-                //todo throw exception
-  
-                return false;
-            };
-        }
+       
+        // foreach ($this->request_keys as $key) {
+ 
+        //     if ($type === 'post' ? !property_exists($request, $key) : !array_key_exists($key, $request)) {
+           
+        //     };
+        // }
         return (object)$request;
     }
 
@@ -335,7 +336,7 @@ if(!$post){
         $response = $this->curl->swapOrderId($data);
 
 
-        file_put_contents(__DIR__ . '/log.json', "\n First Swap was loaded \n" . json_encode($response) . "\n Swap was loaded end \n", FILE_APPEND);
+        file_put_contents(__DIR__ . '/log.json', "\n First Swap was loaded \n [ ".date('d m Y H:i:s'). "]".json_encode($response) . "\n Swap was loaded end \n", FILE_APPEND);
 
         return $response;
     }
